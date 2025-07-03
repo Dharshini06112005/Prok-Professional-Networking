@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { api } from '../../services/api';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const Login: React.FC = () => {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,6 +24,7 @@ const Login: React.FC = () => {
         [name]: ''
       }));
     }
+    setFeedback(null);
   };
 
   const validateForm = () => {
@@ -43,23 +46,22 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setFeedback(null);
     if (!validateForm()) {
       return;
     }
-
     setIsLoading(true);
-    
     try {
-      // TODO: Implement actual login API call
-      console.log('Login attempt:', formData);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For now, just log the data
-      console.log('Login successful');
+      const { ok, data } = await api.login(formData);
+      if (ok) {
+        localStorage.setItem('token', data.token);
+        setFeedback({ type: 'success', message: 'Login successful!' });
+        // Optionally redirect or update app state here
+      } else {
+        setFeedback({ type: 'error', message: data.msg || 'Login failed' });
+      }
     } catch (error) {
-      console.error('Login failed:', error);
+      setFeedback({ type: 'error', message: 'Network error' });
     } finally {
       setIsLoading(false);
     }
@@ -80,6 +82,12 @@ const Login: React.FC = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
             <p className="text-gray-600">Sign in to your account</p>
           </div>
+
+          {feedback && (
+            <div className={`mb-4 text-center text-sm ${feedback.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>
+              {feedback.message}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
