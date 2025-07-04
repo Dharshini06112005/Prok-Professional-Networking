@@ -1,7 +1,7 @@
 from flask import Flask
-from .config import Config
-from .extensions import init_extensions, db
-from .api import auth, feed, jobs, messaging, posts, profile
+from app.backend.config import Config
+from app.backend.extensions import init_extensions, db
+from app.backend.api import auth, feed, jobs, messaging, posts, profile
 
 def create_app(config_class=Config):
     """Application factory pattern"""
@@ -22,5 +22,11 @@ def create_app(config_class=Config):
     # Create database tables
     with app.app_context():
         db.create_all()
-    
+
+    @app.before_request
+    def log_request_info():
+        from flask import request
+        print(f"Request: {request.method} {request.url}")
+        print(f"Headers: {dict(request.headers)}")
+
     return app

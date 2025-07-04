@@ -1,5 +1,5 @@
-from app.backend.app import get_app
+from app.backend.app import create_app
 
 if __name__ == '__main__':
-    app = get_app()
+    app = create_app()
     app.run(debug=True) 

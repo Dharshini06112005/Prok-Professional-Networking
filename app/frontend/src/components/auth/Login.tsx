@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 
 const Login: React.FC = () => {
@@ -10,6 +10,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,7 +57,7 @@ const Login: React.FC = () => {
       if (ok) {
         localStorage.setItem('token', data.token);
         setFeedback({ type: 'success', message: 'Login successful!' });
-        // Optionally redirect or update app state here
+        navigate('/profile');
       } else {
         setFeedback({ type: 'error', message: data.msg || 'Login failed' });
       }

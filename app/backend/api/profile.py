@@ -2,4 +2,4 @@ from flask import Blueprint
 
 profile_bp = Blueprint('profile', __name__)
  
-# Routes will be implemented here 
+# NOTE: Define routes as '/something', not '/api/something'. The blueprint is registered with '/api/profile'. 

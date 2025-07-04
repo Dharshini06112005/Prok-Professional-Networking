@@ -7,7 +7,13 @@ from flask_limiter.util import get_remote_address
 # Initialize extensions
 db = SQLAlchemy()
 jwt = JWTManager()
-cors = CORS()
+# CORS and Limiter are applied globally; do not use per-route decorators or instances.
+cors = CORS(
+    resources={r"/api/*": {"origins": "http://localhost:5173"}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+)
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"]

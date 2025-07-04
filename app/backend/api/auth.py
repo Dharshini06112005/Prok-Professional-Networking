@@ -4,17 +4,17 @@ from app.backend.models.user import User
 from flask_jwt_extended import create_access_token
 import re
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_cors import cross_origin
 
 from flask import current_app as app
+import sys
 
+# Remove per-file Limiter and cross_origin
 # Blueprint
 auth_bp = Blueprint('auth', __name__)
-
-# Rate limiter (attach to app in factory)
-limiter = Limiter(key_func=get_remote_address, default_limits=["10 per minute"])
 
 # Password complexity regex
 PASSWORD_REGEX = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$')
@@ -23,9 +23,7 @@ PASSWORD_REGEX = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$')
 def sanitize_input(value):
     return re.sub(r'<.*?>', '', value.strip())
 
-@auth_bp.route('/api/signup', methods=['POST'])
-@cross_origin()
-@limiter.limit("5 per minute")
+@auth_bp.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     email = sanitize_input(data.get('email', ''))
@@ -53,16 +51,16 @@ def signup():
 
     return jsonify({'msg': 'User created successfully'}), 201
 
-@auth_bp.route('/api/login', methods=['POST'])
-@cross_origin()
-@limiter.limit("10 per minute")
+@auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = sanitize_input(data.get('email', ''))
     password = data.get('password', '')
 
-    # Find user by email only
-    user = User.query.filter_by(email=email).first()
+    # Find user by email only (case-insensitive)
+    user = User.query.filter(func.lower(User.email) == email.lower()).first()
+    # Debug print for password check
+    print(f"User: {user}, Password OK: {user.check_password(password) if user else 'N/A'}", file=sys.stderr)
     if not user or not user.check_password(password):
         return jsonify({'msg': 'Invalid credentials'}), 401
 
