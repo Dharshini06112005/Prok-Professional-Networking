@@ -1,22 +1,16 @@
-from flask_sqlalchemy import SQLAlchemy
+from app.backend.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-
-db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = 'users'
     
-    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    def __init__(self, username, email, password):
-        self.username = username
+    def __init__(self, email, username, password):
         self.email = email
+        self.username = username
         self.set_password(password)
     
     def set_password(self, password):
@@ -27,12 +21,9 @@ class User(db.Model):
     
     def to_dict(self):
         return {
-            'id': self.id,
-            'username': self.username,
             'email': self.email,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'username': self.username
         }
     
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.email}>'
