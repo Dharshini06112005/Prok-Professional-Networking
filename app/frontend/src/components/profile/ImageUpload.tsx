@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { profileApi } from "./api";
 import "./ImageUpload.css";
 
 interface Props {
@@ -10,22 +11,25 @@ interface Props {
 const ImageUpload: React.FC<Props> = ({ value, onChange }) => {
   const [preview, setPreview] = useState(value);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onDrop = (acceptedFiles: File[]) => {
+  const onDrop = async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreview(reader.result as string);
-        onChange(reader.result as string);
+      setPreview(URL.createObjectURL(file));
+      setLoading(true);
+      setError(null);
+      try {
+        // Upload to backend
+        const res = await profileApi.uploadProfileImage(file);
+        onChange(res.url);
         setProgress(100);
-      };
-      reader.onprogress = (e) => {
-        if (e.lengthComputable) {
-          setProgress((e.loaded / e.total) * 100);
-        }
-      };
-      reader.readAsDataURL(file);
+      } catch (err: any) {
+        setError(err.message || "Upload failed");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -42,6 +46,8 @@ const ImageUpload: React.FC<Props> = ({ value, onChange }) => {
           <p className="mt-2">{isDragActive ? "Drop the image here..." : "Drag & drop or click to select an image"}</p>
         </div>
       )}
+      {loading && <div className="text-blue-500 mt-2">Uploading...</div>}
+      {error && <div className="text-red-500 mt-2">{error}</div>}
       {progress > 0 && progress < 100 && (
         <div className="w-full bg-gray-200 rounded h-2 mt-2 overflow-hidden">
           <div className="bg-blue-500 h-2 rounded animate-progress" style={{ width: `${progress}%` }} />

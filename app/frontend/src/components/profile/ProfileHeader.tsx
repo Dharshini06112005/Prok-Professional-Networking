@@ -14,11 +14,17 @@ const socialIcons: Record<string, string> = {
   Instagram: "fab fa-instagram",
 };
 
+const getAvatarUrl = (avatar: string) => {
+  if (!avatar) return '/default-avatar.png';
+  if (avatar.startsWith('/api/')) return `http://localhost:5000${avatar}`;
+  return avatar;
+};
+
 const ProfileHeader: React.FC<Props> = ({ user }) => (
   <div className="profile-header flex flex-col md:flex-row items-center md:items-start p-6 bg-white rounded-2xl shadow-xl animate-fade-in">
     <div className="avatar-wrapper group mb-4 md:mb-0 md:mr-8">
       <img
-        src={user.avatar}
+        src={getAvatarUrl(user.avatar)}
         alt={user.name}
         className="w-28 h-28 rounded-full border-4 border-blue-400 shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:glow-avatar"
       />

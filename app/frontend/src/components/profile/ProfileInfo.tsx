@@ -42,18 +42,19 @@ const ProfileInfo: React.FC<Props> = ({ user }) => (
     </CollapsibleSection>
     <CollapsibleSection title="Experience">
       {user.experience.map((exp, idx) => (
-        <div key={idx} className="mb-2 animate-fade-in-slow">
-          <div className="font-bold">{exp.title} @ {exp.company}</div>
-          <div className="text-sm text-gray-600">{exp.startDate} - {exp.endDate || "Present"}</div>
-          <div>{exp.description}</div>
+        <div key={idx} className="experience-item animate-fade-in-slow">
+          <div className="experience-title">{exp.title} @ {exp.company}</div>
+          <div className="experience-dates">{exp.startDate} - {exp.endDate || "Present"}</div>
+          <div className="experience-description">{exp.description}</div>
         </div>
       ))}
     </CollapsibleSection>
     <CollapsibleSection title="Education">
       {user.education.map((edu, idx) => (
-        <div key={idx} className="mb-2 animate-fade-in-slow">
-          <div className="font-bold">{edu.degree} in {edu.field}</div>
-          <div className="text-sm text-gray-600">{edu.school} ({edu.startDate} - {edu.endDate})</div>
+        <div key={idx} className="education-item animate-fade-in-slow">
+          <div className="education-degree">{edu.degree} in {edu.field}</div>
+          <div className="education-school">{edu.school}</div>
+          <div className="education-dates">{edu.startDate} - {edu.endDate}</div>
         </div>
       ))}
     </CollapsibleSection>

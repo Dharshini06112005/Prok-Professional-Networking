@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,7 +57,7 @@ const Login: React.FC = () => {
     try {
       const { ok, data } = await api.login(formData);
       if (ok) {
-        localStorage.setItem('token', data.token);
+        login(data.token, data.user);
         setFeedback({ type: 'success', message: 'Login successful!' });
         navigate('/profile');
       } else {

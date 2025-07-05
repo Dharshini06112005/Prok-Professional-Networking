@@ -83,3 +83,86 @@
   from { opacity: 0; }
   to { opacity: 1; }
 } 
+
+/* Education and Experience Sections */
+.btn-add {
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-add:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-add:active {
+  transform: translateY(0);
+}
+
+/* Experience and Education Cards */
+.experience-card,
+.education-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: #f9fafb;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.experience-card:hover,
+.education-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Remove button styling */
+.btn-remove {
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.btn-remove:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+  transform: scale(1.05);
+}
+
+/* Grid layout for form fields */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .experience-card,
+  .education-card {
+    padding: 0.75rem;
+  }
+}
+
+/* Animation for new entries */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.experience-card,
+.education-card {
+  animation: slideIn 0.3s ease-out;
+} 

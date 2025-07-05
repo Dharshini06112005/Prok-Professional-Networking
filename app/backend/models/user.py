@@ -8,6 +8,8 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     
+    profile = db.relationship('Profile', backref='user', uselist=False)
+    
     def __init__(self, email, username, password):
         self.email = email
         self.username = username

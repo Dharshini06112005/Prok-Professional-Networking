@@ -4,19 +4,108 @@
 .collapsible-content {
   transition-property: max-height, opacity;
 }
-.skill-chip {
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 4px rgba(59,130,246,0.08);
-}
-.skill-chip:hover {
-  background: #dbeafe;
-  transform: scale(1.1) rotate(-3deg);
-  box-shadow: 0 2px 8px rgba(59,130,246,0.15);
-}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 .animate-fade-in-slow {
   animation: fadeIn 1.5s cubic-bezier(.4,0,.2,1);
+} 
+
+/* Experience and Education Display */
+.experience-item,
+.education-item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid #3b82f6;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 0 0.5rem 0.5rem 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.experience-item:hover,
+.education-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  border-left-color: #1d4ed8;
+}
+
+.experience-item::before,
+.education-item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 1.5rem;
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.experience-title,
+.education-degree {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.experience-company,
+.education-school {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.experience-dates,
+.education-dates {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.experience-description {
+  color: #475569;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+/* Timeline effect for multiple entries */
+.experience-item:not(:last-child)::after,
+.education-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 3rem;
+  width: 2px;
+  height: calc(100% + 1rem);
+  background: linear-gradient(to bottom, #3b82f6, #e2e8f0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .experience-item,
+  .education-item {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .experience-title,
+  .education-degree {
+    font-size: 1rem;
+  }
+  
+  .experience-item:hover,
+  .education-item:hover {
+    transform: translateX(2px);
+  }
 } 
