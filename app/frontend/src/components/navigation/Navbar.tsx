@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
               <Link to="/feed" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                 Feed
               </Link>
-              <Link to="/posts" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link to="/posts/create" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                 Posts
               </Link>
               <Link to="/jobs" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
