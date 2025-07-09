@@ -8,9 +8,9 @@ from flask_limiter.util import get_remote_address
 db = SQLAlchemy()
 jwt = JWTManager()
 
-# CORS configuration - simplified and more permissive for development
+# CORS configuration - allow all Vite dev ports for local development
 cors = CORS(
-    origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    origins=[f"http://localhost:{port}" for port in range(5173, 5181)],
     supports_credentials=True,
     allow_headers=["Content-Type", "Authorization", "Accept"],
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],

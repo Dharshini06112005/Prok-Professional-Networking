@@ -6,6 +6,8 @@ from app.backend.models.post import Post
 import os, time
 from werkzeug.utils import secure_filename
 from PIL import Image
+from sqlalchemy import or_, desc, asc
+import re
 
 posts_bp = Blueprint('posts', __name__)
 
@@ -14,6 +16,12 @@ ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'webm'}
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB
 os.makedirs(MEDIA_FOLDER, exist_ok=True)
+
+# Simple in-memory cache for categories and tags
+_categories_cache = None
+_popular_tags_cache = None
+_cache_timestamp = 0
+CACHE_DURATION = 300  # 5 minutes
 
 def allowed_file(filename):
     ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
@@ -31,6 +39,12 @@ def compress_and_save_image(file, filename):
     img.save(save_path, format='JPEG', quality=85)
     return filename
 
+def invalidate_cache():
+    global _categories_cache, _popular_tags_cache, _cache_timestamp
+    _categories_cache = None
+    _popular_tags_cache = None
+    _cache_timestamp = 0
+
 @posts_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_post():
@@ -38,15 +52,22 @@ def create_post():
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'msg': 'User not found'}), 404
+    
     title = request.form.get('title', '').strip()
     if not title:
         return jsonify({'msg': 'Title is required'}), 400
+    
     allow_comments = request.form.get('allow_comments', 'true').lower() == 'true'
     is_public = request.form.get('is_public', 'true').lower() == 'true'
     content = request.form.get('content', '').strip()
+    category = request.form.get('category', '').strip()
+    tags = request.form.get('tags', '').strip()
+    
     if not content:
         return jsonify({'msg': 'Content is required'}), 400
+    
     media_url = None
+    media_type = None
     if 'media' in request.files:
         file = request.files['media']
         if file.filename == '':
@@ -58,16 +79,40 @@ def create_post():
         file.seek(0)
         if file_length > MAX_FILE_SIZE:
             return jsonify({'msg': 'File too large'}), 400
-        ext = file.filename.rsplit('.', 1)[1].lower()
-        filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.{ext}")
+        ext = file.filename.rsplit('.', 1)[1].lower() if file.filename and '.' in file.filename else ''
+        # If image, always save as jpg
         if is_image(file.filename):
+            filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.jpg")
             compress_and_save_image(file, filename)
+            media_type = 'image/jpeg'
+            media_url = f'/api/posts/media/{filename}'
         else:
+            filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.{ext}")
             file.save(os.path.join(MEDIA_FOLDER, filename))
-        media_url = f'/api/posts/media/{filename}'
-    post = Post(user_email=email, title=title, content=content, media_url=media_url, allow_comments=allow_comments, is_public=is_public)
+            # Set media type based on file extension
+            if ext in ['mp4', 'webm', 'avi', 'mov']:
+                media_type = f'video/{ext}'
+            else:
+                media_type = 'application/octet-stream'
+            media_url = f'/api/posts/media/{filename}'
+    
+    post = Post(
+        user_email=email, 
+        title=title, 
+        content=content, 
+        media_url=media_url, 
+        media_type=media_type,
+        allow_comments=allow_comments, 
+        is_public=is_public,
+        category=category if category else None,
+        tags=tags if tags else None
+    )
     db.session.add(post)
     db.session.commit()
+    
+    # Invalidate cache when new post is created
+    invalidate_cache()
+    
     return jsonify(post.to_dict()), 201
 
 @posts_bp.route('', methods=['POST', 'OPTIONS'])
@@ -78,9 +123,167 @@ def create_post_no_slash():
 @posts_bp.route('/', methods=['GET'])
 @jwt_required()
 def list_posts():
-    posts = Post.query.order_by(Post.created_at.desc()).all()
-    return jsonify([p.to_dict() for p in posts]), 200
+    # Get query parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 10, type=int), 50)  # Max 50 per page
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip()
+    visibility = request.args.get('visibility', '').strip()
+    tag = request.args.get('tag', '').strip()
+    sort = request.args.get('sort', 'created_at')
+    
+    # Build query
+    query = Post.query
+    
+    # Apply filters
+    if search:
+        search_filter = or_(
+            Post.title.ilike(f'%{search}%'),
+            Post.content.ilike(f'%{search}%')
+        )
+        query = query.filter(search_filter)
+    
+    if category:
+        query = query.filter(Post.category == category)
+    
+    if visibility:
+        if visibility == 'public':
+            query = query.filter(Post.is_public == True)
+        elif visibility == 'private':
+            query = query.filter(Post.is_public == False)
+    
+    if tag:
+        query = query.filter(Post.tags.ilike(f'%{tag}%'))
+    
+    # Apply sorting
+    if sort == 'likes':
+        query = query.order_by(desc(Post.likes))
+    elif sort == 'views':
+        query = query.order_by(desc(Post.views))
+    elif sort == 'created_at':
+        query = query.order_by(desc(Post.created_at))
+    else:
+        query = query.order_by(desc(Post.created_at))
+    
+    # Apply pagination
+    pagination = query.paginate(
+        page=page, 
+        per_page=per_page, 
+        error_out=False
+    )
+    
+    posts = pagination.items
+    
+    # Convert to dict and add user info
+    posts_data = []
+    for post in posts:
+        post_dict = post.to_dict()
+        user = User.query.filter_by(email=post.user_email).first()
+        post_dict['user'] = {
+            'name': user.username if user else 'Unknown User',
+            'email': post.user_email
+        }
+        # Add comments count (placeholder for now)
+        post_dict['comments_count'] = 0
+        posts_data.append(post_dict)
+    
+    return jsonify({
+        'posts': posts_data,
+        'pagination': {
+            'page': page,
+            'per_page': per_page,
+            'total': pagination.total,
+            'pages': pagination.pages,
+            'has_next': pagination.has_next,
+            'has_prev': pagination.has_prev
+        }
+    }), 200
+
+@posts_bp.route('/categories', methods=['GET'])
+@jwt_required()
+def get_categories():
+    global _categories_cache, _cache_timestamp
+    
+    # Check cache
+    current_time = time.time()
+    if _categories_cache and (current_time - _cache_timestamp) < CACHE_DURATION:
+        return jsonify({'categories': _categories_cache}), 200
+    
+    # Query database
+    categories = db.session.query(Post.category).filter(
+        Post.category.isnot(None),
+        Post.category != ''
+    ).distinct().all()
+    
+    category_list = [cat[0] for cat in categories if cat[0]]
+    
+    # Update cache
+    _categories_cache = category_list
+    _cache_timestamp = current_time
+    
+    return jsonify({'categories': category_list}), 200
+
+@posts_bp.route('/popular-tags', methods=['GET'])
+@jwt_required()
+def get_popular_tags():
+    global _popular_tags_cache, _cache_timestamp
+    
+    # Check cache
+    current_time = time.time()
+    if _popular_tags_cache and (current_time - _cache_timestamp) < CACHE_DURATION:
+        return jsonify({'tags': _popular_tags_cache}), 200
+    
+    # Query database for all tags
+    posts_with_tags = Post.query.filter(
+        Post.tags.isnot(None),
+        Post.tags != ''
+    ).all()
+    
+    # Count tag frequency
+    tag_counts = {}
+    for post in posts_with_tags:
+        if post.tags:
+            tags = [tag.strip() for tag in post.tags.split(',') if tag.strip()]
+            for tag in tags:
+                tag_counts[tag] = tag_counts.get(tag, 0) + 1
+    
+    # Sort by frequency and get top 20
+    popular_tags = sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)[:20]
+    tag_list = [tag for tag, count in popular_tags]
+    
+    # Update cache
+    _popular_tags_cache = tag_list
+    _cache_timestamp = current_time
+    
+    return jsonify({'tags': tag_list}), 200
 
 @posts_bp.route('/media/<filename>', methods=['GET'])
 def serve_media(filename):
+    ext = filename.rsplit('.', 1)[-1].lower()
+    if ext in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
+        mimetype = 'image/jpeg' if ext in ['jpg', 'jpeg'] else f'image/{ext}'
+        return send_from_directory(MEDIA_FOLDER, filename, mimetype=mimetype)
+    elif ext in ['mp4', 'webm', 'avi', 'mov']:
+        mimetype = f'video/{ext}'
+        return send_from_directory(MEDIA_FOLDER, filename, mimetype=mimetype)
     return send_from_directory(MEDIA_FOLDER, filename) 
+
+@posts_bp.route('/<int:post_id>', methods=['DELETE'])
+@jwt_required()
+def delete_post(post_id):
+    email = get_jwt_identity()
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'msg': 'Post not found'}), 404
+    if post.user_email != email:
+        return jsonify({'msg': 'Unauthorized'}), 403
+    # Delete media file if exists
+    if post.media_url:
+        filename = post.media_url.split('/')[-1]
+        file_path = os.path.join(MEDIA_FOLDER, filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    db.session.delete(post)
+    db.session.commit()
+    invalidate_cache()
+    return jsonify({'msg': 'Post deleted successfully'}), 200 

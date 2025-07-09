@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import React, { useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:5000/api/posts/';
 
 const PostCreate: React.FC = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [media, setMedia] = useState<File | null>(null);
@@ -29,7 +29,7 @@ const PostCreate: React.FC = () => {
       setError('Title is required.');
       return false;
     }
-    if (!content || content.replace(/<(.|\n)*?>/g, '').trim().length === 0) {
+    if (!content.trim()) {
       setError('Post content is required.');
       return false;
     }
@@ -80,6 +80,11 @@ const PostCreate: React.FC = () => {
       setAllowComments(true);
       setIsPublic(true);
       if (fileInputRef.current) fileInputRef.current.value = '';
+      
+      // Navigate to posts list after successful creation
+      setTimeout(() => {
+        navigate('/posts');
+      }, 1500);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -123,7 +128,13 @@ const PostCreate: React.FC = () => {
         </div>
         <div className="mb-4">
           <label className="block font-medium mb-1">Content</label>
-          <ReactQuill value={content} onChange={setContent} placeholder="What's on your mind?" />
+          <textarea
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            placeholder="What's on your mind?"
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 min-h-[200px] resize-y"
+            required
+          />
         </div>
         <div className="mb-4">
           <label className="block font-medium mb-1">Media</label>
@@ -178,7 +189,7 @@ const PostCreate: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Preview</h3>
           <div className="border rounded p-4 bg-gray-50">
             <div className="font-bold text-lg mb-2">{title}</div>
-            <div dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="whitespace-pre-wrap">{content}</div>
             {mediaPreview && (
               <div className="mt-2">
                 {media?.type.startsWith('image') ? (

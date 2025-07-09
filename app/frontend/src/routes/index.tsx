@@ -9,6 +9,7 @@ import Feed from '../components/feed/Feed';
 import JobList from '../components/job-board/JobList';
 import MessageList from '../components/messaging/MessageList';
 import Layout from '../components/layout/Layout';
+import PostView from '../components/posts/PostView';
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
       {
         path: 'posts',
         element: <PostList />,
+      },
+      {
+        path: 'posts/:id',
+        element: <PostView />,
       },
       {
         path: 'feed',

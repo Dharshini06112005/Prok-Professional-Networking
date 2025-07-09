@@ -30,3 +30,8 @@ def create_app(config_class=Config):
         print(f"Headers: {dict(request.headers)}")
 
     return app
+
+if __name__ == "__main__":
+    app = create_app()
+    print("Backend running at http://localhost:5000")
+    app.run(debug=True)
