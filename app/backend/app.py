@@ -28,17 +28,6 @@ def create_app(config_class=Config):
         print(f"Request: {request.method} {request.url}")
         print(f"Headers: {dict(request.headers)}")
 
-    @app.after_request
-    def add_cors_headers(response):
-        # Add CORS headers to all responses
-        if request.method == 'OPTIONS':
-            response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
-            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
-            response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-            response.headers.add('Access-Control-Allow-Credentials', 'true')
-            response.headers.add('Access-Control-Max-Age', '3600')
-        return response
-
     return app
 
 if __name__ == "__main__":
