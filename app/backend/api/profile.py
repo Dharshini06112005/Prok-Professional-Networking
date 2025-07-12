@@ -130,9 +130,10 @@ def update_profile():
 @profile_bp.route('/image', methods=['OPTIONS'])
 def options_upload():
     response = jsonify({'msg': 'OK'})
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
 @profile_bp.route('/image', methods=['POST'])
@@ -172,9 +173,10 @@ def upload_image():
         db.session.commit()
         response = jsonify({'url': profile.avatar})
         # Add CORS headers for upload response
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
         return response, 200
     except Exception as e:
         db.session.rollback()
@@ -183,9 +185,10 @@ def upload_image():
 @profile_bp.route('/image/<filename>', methods=['OPTIONS'])
 def options_image(filename):
     response = jsonify({'msg': 'OK'})
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
 @profile_bp.route('/image/<filename>', methods=['GET'])
@@ -193,9 +196,10 @@ def serve_image(filename):
     try:
         response = send_from_directory(UPLOAD_FOLDER, filename)
         # Add CORS headers for image serving
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
         response.headers.add('Cache-Control', 'public, max-age=31536000')
         return response
     except Exception as e:
