@@ -48,7 +48,14 @@ def get_profile():
             db.session.add(profile)
             db.session.commit()
             return jsonify(profile.to_dict()), 200
-        return jsonify(user.profile.to_dict()), 200
+        
+        # Ensure avatar URL is absolute
+        profile_data = user.profile.to_dict()
+        if profile_data.get('avatar') and not profile_data['avatar'].startswith('http'):
+            backend_url = os.environ.get('BACKEND_URL', 'https://prok-professional-networking-t19l.onrender.com')
+            profile_data['avatar'] = f"{backend_url}{profile_data['avatar']}"
+        
+        return jsonify(profile_data), 200
     except Exception as e:
         return jsonify({'msg': 'Server error', 'error': str(e)}), 500
 
@@ -149,7 +156,9 @@ def upload_image():
         filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.jpg")
         compress_and_save_image(file, filename)
         profile = user.profile or Profile(user_email=email)
-        profile.avatar = f'/api/profile/image/{filename}'
+        # Use full backend URL for avatar
+        backend_url = os.environ.get('BACKEND_URL', 'https://prok-professional-networking-t19l.onrender.com')
+        profile.avatar = f'{backend_url}/api/profile/image/{filename}'
         if not user.profile:
             db.session.add(profile)
         db.session.commit()
