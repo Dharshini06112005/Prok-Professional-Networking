@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from config import Config
 from extensions import init_extensions, db
 from api import auth, feed, jobs, messaging, posts, profile
@@ -22,6 +22,15 @@ def create_app(config_class=Config):
     # Create database tables
     with app.app_context():
         db.create_all()
+
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        """Health check endpoint"""
+        return jsonify({
+            'status': 'healthy',
+            'message': 'Backend is running properly',
+            'timestamp': request.environ.get('REQUEST_TIME', 'unknown')
+        }), 200
 
     @app.before_request
     def log_request_info():

@@ -22,22 +22,62 @@ async function handleTokenExpiry(response: Response) {
   }
 }
 
+// Enhanced error handling
+async function handleApiResponse(response: Response) {
+  await handleTokenExpiry(response);
+  
+  if (!response.ok) {
+    let errorMessage = 'Network error occurred';
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.msg || errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+    } catch (e) {
+      errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+  
+  return response.json();
+}
+
+// Network error detection
+async function safeFetch(url: string, options: RequestInit = {}) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout - please try again');
+    } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network connection failed - please check your internet connection');
+    } else {
+      throw new Error(`Network error: ${error.message}`);
+    }
+  }
+}
+
 const API_URL = import.meta.env.VITE_API_URL || "https://prok-professional-networking-t19l.onrender.com";
 
 export const profileApi = {
   getProfile: async () => {
-    const response = await fetch(`${API_URL}/api/profile/`, {
+    const response = await safeFetch(`${API_URL}/api/profile/`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    await handleTokenExpiry(response);
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    return handleApiResponse(response);
   },
 
   updateProfile: async (profileData: any) => {
-    const response = await fetch(`${API_URL}/api/profile/`, {
+    const response = await safeFetch(`${API_URL}/api/profile/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -45,23 +85,19 @@ export const profileApi = {
       },
       body: JSON.stringify(profileData),
     });
-    await handleTokenExpiry(response);
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    return handleApiResponse(response);
   },
 
   uploadProfileImage: async (file: File) => {
     const formData = new FormData();
     formData.append('image', file);
-    const response = await fetch(`${API_URL}/api/profile/image`, {
+    const response = await safeFetch(`${API_URL}/api/profile/image`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: formData,
     });
-    await handleTokenExpiry(response);
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    return handleApiResponse(response);
   },
 }; 

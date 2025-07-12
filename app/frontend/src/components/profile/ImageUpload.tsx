@@ -20,20 +20,48 @@ const ImageUpload: React.FC<Props> = ({ value, onChange }) => {
       setPreview(URL.createObjectURL(file));
       setLoading(true);
       setError(null);
+      setProgress(0);
+      
       try {
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('File size must be less than 5MB');
+        }
+        
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          throw new Error('Please select a valid image file');
+        }
+        
+        setProgress(25);
+        
         // Upload to backend
         const res = await profileApi.uploadProfileImage(file);
         onChange(res.url);
         setProgress(100);
+        
+        // Clear error on success
+        setError(null);
+        
       } catch (err: any) {
-        setError(err.message || "Upload failed");
+        console.error('Upload error:', err);
+        setError(err.message || "Upload failed - please try again");
+        setProgress(0);
+        
+        // Reset preview on error
+        setPreview(value);
       } finally {
         setLoading(false);
       }
     }
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: { "image/*": [] } });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
+    onDrop, 
+    accept: { "image/*": [] },
+    maxSize: 5 * 1024 * 1024, // 5MB
+    multiple: false
+  });
 
   return (
     <div {...getRootProps()} className={`image-upload-zone border-2 border-dashed p-4 rounded mb-2 text-center cursor-pointer transition-all duration-300 ${isDragActive ? "border-blue-500 bg-blue-50 animate-glow" : "border-gray-300"}`}>
@@ -47,7 +75,7 @@ const ImageUpload: React.FC<Props> = ({ value, onChange }) => {
         </div>
       )}
       {loading && <div className="text-blue-500 mt-2">Uploading...</div>}
-      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {error && <div className="text-red-500 mt-2 text-sm">{error}</div>}
       {progress > 0 && progress < 100 && (
         <div className="w-full bg-gray-200 rounded h-2 mt-2 overflow-hidden">
           <div className="bg-blue-500 h-2 rounded animate-progress" style={{ width: `${progress}%` }} />
