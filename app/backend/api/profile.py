@@ -131,9 +131,10 @@ def update_profile():
 def options_upload():
     response = jsonify({'msg': 'OK'})
     response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
     response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Max-Age', '3600')
     return response
 
 @profile_bp.route('/image', methods=['POST'])
@@ -174,9 +175,10 @@ def upload_image():
         response = jsonify({'url': profile.avatar})
         # Add CORS headers for upload response
         response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
         response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
         response.headers.add('Access-Control-Allow-Credentials', 'true')
+        response.headers.add('Access-Control-Max-Age', '3600')
         return response, 200
     except Exception as e:
         db.session.rollback()

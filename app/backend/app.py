@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from config import Config
 from extensions import init_extensions, db
 from api import auth, feed, jobs, messaging, posts, profile
@@ -25,9 +25,19 @@ def create_app(config_class=Config):
 
     @app.before_request
     def log_request_info():
-        from flask import request
         print(f"Request: {request.method} {request.url}")
         print(f"Headers: {dict(request.headers)}")
+
+    @app.after_request
+    def add_cors_headers(response):
+        # Add CORS headers to all responses
+        if request.method == 'OPTIONS':
+            response.headers.add('Access-Control-Allow-Origin', 'https://prok-frontend-aeh5.onrender.com')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            response.headers.add('Access-Control-Max-Age', '3600')
+        return response
 
     return app
 
