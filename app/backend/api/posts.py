@@ -120,6 +120,77 @@ def create_post():
 def create_post_no_slash():
     return create_post()
 
+@posts_bp.route('/public', methods=['GET'])
+def list_public_posts():
+    """List public posts - no authentication required"""
+    # Get query parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 10, type=int), 50)  # Max 50 per page
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip()
+    tag = request.args.get('tag', '').strip()
+    sort = request.args.get('sort', 'created_at')
+    
+    # Build query - only public posts
+    query = Post.query.filter(Post.is_public == True)
+    
+    # Apply filters
+    if search:
+        search_filter = or_(
+            Post.title.ilike(f'%{search}%'),
+            Post.content.ilike(f'%{search}%')
+        )
+        query = query.filter(search_filter)
+    
+    if category:
+        query = query.filter(Post.category == category)
+    
+    if tag:
+        query = query.filter(Post.tags.ilike(f'%{tag}%'))
+    
+    # Apply sorting
+    if sort == 'likes':
+        query = query.order_by(desc(Post.likes))
+    elif sort == 'views':
+        query = query.order_by(desc(Post.views))
+    elif sort == 'created_at':
+        query = query.order_by(desc(Post.created_at))
+    else:
+        query = query.order_by(desc(Post.created_at))
+    
+    # Apply pagination
+    pagination = query.paginate(
+        page=page, 
+        per_page=per_page, 
+        error_out=False
+    )
+    
+    posts = pagination.items
+    
+    # Convert to dict and add user info
+    posts_data = []
+    for post in posts:
+        post_dict = post.to_dict()
+        user = User.query.filter_by(email=post.user_email).first()
+        post_dict['user'] = {
+            'name': user.username if user else 'Unknown User',
+            'email': post.user_email
+        }
+        post_dict['comments_count'] = 0
+        posts_data.append(post_dict)
+    
+    return jsonify({
+        'posts': posts_data,
+        'pagination': {
+            'page': page,
+            'per_page': per_page,
+            'total': pagination.total,
+            'pages': pagination.pages,
+            'has_next': pagination.has_next,
+            'has_prev': pagination.has_prev
+        }
+    }), 200
+
 @posts_bp.route('/', methods=['GET'])
 @jwt_required()
 def list_posts():
@@ -267,6 +338,63 @@ def serve_media(filename):
         mimetype = f'video/{ext}'
         return send_from_directory(MEDIA_FOLDER, filename, mimetype=mimetype)
     return send_from_directory(MEDIA_FOLDER, filename) 
+
+@posts_bp.route('/<int:post_id>', methods=['GET'])
+def get_post(post_id):
+    """Get a single post by ID - public endpoint for sharing"""
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'msg': 'Post not found'}), 404
+    
+    # Check if post is public
+    if not post.is_public:
+        # For private posts, require authentication
+        try:
+            from flask_jwt_extended import get_jwt_identity
+            email = get_jwt_identity()
+            if email != post.user_email:
+                return jsonify({'msg': 'Post is private'}), 403
+        except:
+            return jsonify({'msg': 'Post is private'}), 403
+    
+    # Increment view count
+    post.views = (post.views or 0) + 1
+    db.session.commit()
+    
+    # Convert to dict and add user info
+    post_dict = post.to_dict()
+    user = User.query.filter_by(email=post.user_email).first()
+    post_dict['user'] = {
+        'name': user.username if user else 'Unknown User',
+        'email': post.user_email
+    }
+    post_dict['comments_count'] = 0
+    
+    return jsonify(post_dict), 200
+
+@posts_bp.route('/<int:post_id>/like', methods=['POST'])
+def like_post(post_id):
+    """Like a post - works for public posts without authentication"""
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'msg': 'Post not found'}), 404
+    
+    # Check if post is public
+    if not post.is_public:
+        # For private posts, require authentication
+        try:
+            from flask_jwt_extended import get_jwt_identity
+            email = get_jwt_identity()
+            if email != post.user_email:
+                return jsonify({'msg': 'Post is private'}), 403
+        except:
+            return jsonify({'msg': 'Post is private'}), 403
+    
+    # Increment likes
+    post.likes = (post.likes or 0) + 1
+    db.session.commit()
+    
+    return jsonify({'msg': 'Post liked successfully', 'likes': post.likes}), 200
 
 @posts_bp.route('/<int:post_id>', methods=['DELETE'])
 @jwt_required()
