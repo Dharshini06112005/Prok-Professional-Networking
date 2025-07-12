@@ -21,11 +21,10 @@ interface PostCardProps {
 }
 
 // Helper to get absolute media URL
-const getMediaUrl = (media_url?: string) => {
-  if (!media_url) return undefined;
+const getMediaUrl = (media_url: string) => {
+  if (!media_url) return '';
   if (media_url.startsWith('http')) return media_url;
-  // Always use backend server for media
-  return `http://localhost:5000${media_url}`;
+  return `https://prok-professional-networking-t19l.onrender.com${media_url}`;
 };
 
 const PostCard: React.FC<PostCardProps & { onDelete?: (id: number) => void }> = ({ post, onDelete }) => {
@@ -67,13 +66,13 @@ const PostCard: React.FC<PostCardProps & { onDelete?: (id: number) => void }> = 
     return () => observer.disconnect();
   }, [post.media_url]);
 
-  const mediaSrc = getMediaUrl(post.media_url);
+  const mediaSrc = getMediaUrl(post.media_url || '');
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this post?')) return;
     setDeleting(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${post.id}`, {
+      const res = await fetch(`https://prok-professional-networking-t19l.onrender.com/api/posts/${post.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

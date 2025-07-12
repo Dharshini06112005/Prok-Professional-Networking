@@ -8,10 +8,9 @@ const Feed: React.FC = () => {
 
   useEffect(() => {
     const fetchFeed = async () => {
-      setLoading(true);
-      setError(null);
       try {
-        const res = await fetch('http://localhost:5000/api/feed/', {
+        setLoading(true);
+        const res = await fetch('https://prok-professional-networking-t19l.onrender.com/api/feed/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },

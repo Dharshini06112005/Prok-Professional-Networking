@@ -16,7 +16,8 @@ const socialIcons: Record<string, string> = {
 
 const getAvatarUrl = (avatar: string) => {
   if (!avatar) return '/default-avatar.png';
-  if (avatar.startsWith('/api/')) return `http://localhost:5000${avatar}`;
+  if (avatar.startsWith('http')) return avatar;
+  if (avatar.startsWith('/api/')) return `https://prok-professional-networking-t19l.onrender.com${avatar}`;
   return avatar;
 };
 

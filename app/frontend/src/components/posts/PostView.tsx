@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { postsApi } from './api';
 
-const getMediaUrl = (media_url?: string) => {
-  if (!media_url) return undefined;
+const getMediaUrl = (media_url: string) => {
+  if (!media_url) return '';
   if (media_url.startsWith('http')) return media_url;
-  return `http://localhost:5000${media_url}`;
+  return `https://prok-professional-networking-t19l.onrender.com${media_url}`;
 };
 
 const PostView: React.FC = () => {
@@ -19,7 +19,7 @@ const PostView: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`http://localhost:5000/api/posts/${id}`, {
+        const res = await fetch(`https://prok-professional-networking-t19l.onrender.com/api/posts/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },

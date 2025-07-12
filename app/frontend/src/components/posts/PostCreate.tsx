@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'http://localhost:5000/api/posts/';
+const API_URL = 'https://prok-professional-networking-t19l.onrender.com/api/posts/';
 
 const PostCreate: React.FC = () => {
   const navigate = useNavigate();
