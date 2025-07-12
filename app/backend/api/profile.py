@@ -153,7 +153,12 @@ def upload_image():
         if not user.profile:
             db.session.add(profile)
         db.session.commit()
-        return jsonify({'url': profile.avatar}), 200
+        response = jsonify({'url': profile.avatar})
+        # Add CORS headers for upload response
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+        return response, 200
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Image upload failed', 'error': str(e)}), 500
@@ -161,6 +166,11 @@ def upload_image():
 @profile_bp.route('/image/<filename>', methods=['GET'])
 def serve_image(filename):
     try:
-        return send_from_directory(UPLOAD_FOLDER, filename)
+        response = send_from_directory(UPLOAD_FOLDER, filename)
+        # Add CORS headers for image serving
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response
     except Exception as e:
         return jsonify({'msg': 'Image not found', 'error': str(e)}), 404 

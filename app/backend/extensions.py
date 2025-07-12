@@ -13,8 +13,8 @@ jwt = JWTManager()
 cors = CORS(
     origins="*",
     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
-    supports_credentials=False,
+    allow_headers=['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    supports_credentials=True,
     max_age=3600
 )
 
