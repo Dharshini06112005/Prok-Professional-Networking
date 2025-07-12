@@ -9,14 +9,12 @@ import os
 db = SQLAlchemy()
 jwt = JWTManager()
 
-# CORS configuration - allow production origins from environment variables
-ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,https://your-frontend-url.onrender.com').split(',')
-
+# CORS configuration - allow all origins for now
 cors = CORS(
-    origins=ALLOWED_ORIGINS,
+    origins="*",
     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
-    supports_credentials=True,
+    supports_credentials=False,
     max_age=3600
 )
 
