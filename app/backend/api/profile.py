@@ -127,6 +127,14 @@ def update_profile():
         db.session.rollback()
         return jsonify({'msg': 'Profile update failed', 'error': str(e)}), 500
 
+@profile_bp.route('/image', methods=['OPTIONS'])
+def options_upload():
+    response = jsonify({'msg': 'OK'})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+    return response
+
 @profile_bp.route('/image', methods=['POST'])
 @jwt_required()
 def upload_image():
@@ -172,6 +180,14 @@ def upload_image():
         db.session.rollback()
         return jsonify({'msg': 'Image upload failed', 'error': str(e)}), 500
 
+@profile_bp.route('/image/<filename>', methods=['OPTIONS'])
+def options_image(filename):
+    response = jsonify({'msg': 'OK'})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+    return response
+
 @profile_bp.route('/image/<filename>', methods=['GET'])
 def serve_image(filename):
     try:
@@ -180,6 +196,7 @@ def serve_image(filename):
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        response.headers.add('Cache-Control', 'public, max-age=31536000')
         return response
     except Exception as e:
         return jsonify({'msg': 'Image not found', 'error': str(e)}), 404 
