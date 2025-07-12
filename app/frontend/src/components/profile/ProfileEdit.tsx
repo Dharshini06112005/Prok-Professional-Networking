@@ -92,19 +92,32 @@ const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (submitting) {
+      return;
+    }
+    
     const errs = validate();
     setErrors(errs);
     setError(null);
+    
     if (Object.keys(errs).length === 0) {
       setSubmitting(true);
+      setSuccess(false);
+      
       try {
+        console.log('Saving profile...');
         // Always send skills as a flat array
         const updated = await profileApi.updateProfile({ ...form, skills: form.skills });
+        console.log('Profile saved successfully:', updated);
         onSave(updated);
         setSuccess(true);
-        setTimeout(() => setSuccess(false), 1500);
+        setTimeout(() => setSuccess(false), 2000);
       } catch (err: any) {
-        setError(err.message || "Update failed");
+        console.error('Profile save error:', err);
+        setError(err.message || "Update failed - please try again");
+        setSuccess(false);
       } finally {
         setSubmitting(false);
       }

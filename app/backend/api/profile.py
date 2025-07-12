@@ -70,8 +70,13 @@ def update_profile():
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify({'msg': 'User not found'}), 404
+        
         data = request.get_json()
+        if not data:
+            return jsonify({'msg': 'No data provided'}), 400
+            
         profile = user.profile or Profile(user_email=email)
+        
         # Validation
         required_fields = ['name', 'title', 'contact']
         for field in required_fields:
@@ -79,6 +84,7 @@ def update_profile():
                 return jsonify({'msg': f'{field} is required'}), 400
         if 'email' not in data['contact'] or not data['contact']['email']:
             return jsonify({'msg': 'Contact email is required'}), 400
+        
         # Fields
         json_fields = ['social', 'experience', 'education', 'contact', 'activity']
         for field in ['avatar', 'name', 'title', 'location', 'bio', 'connections', 'mutualConnections', 'skills']:
@@ -114,17 +120,39 @@ def update_profile():
                     setattr(profile, db_field, json.dumps(data[field]))
                 else:
                     setattr(profile, db_field, data[field])
+        
         for field in json_fields:
             db_field = field if field != 'mutualConnections' else 'mutual_connections'
             value = data.get(field, getattr(profile, db_field, None))
             if not isinstance(value, str):
                 setattr(profile, db_field, json.dumps(value if value is not None else [] if field != 'contact' else {}))
+        
         if not user.profile:
             db.session.add(profile)
-        db.session.commit()
-        return jsonify(profile.to_dict()), 200
+        
+        # Commit with retry logic
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                db.session.commit()
+                break
+            except Exception as commit_error:
+                if attempt == max_retries - 1:
+                    raise commit_error
+                db.session.rollback()
+                import time
+                time.sleep(0.1 * (attempt + 1))  # Small delay before retry
+        
+        # Ensure avatar URL is absolute in response
+        profile_data = profile.to_dict()
+        if profile_data.get('avatar') and not profile_data['avatar'].startswith('http'):
+            backend_url = os.environ.get('BACKEND_URL', 'https://prok-professional-networking-t19l.onrender.com')
+            profile_data['avatar'] = f"{backend_url}{profile_data['avatar']}"
+        
+        return jsonify(profile_data), 200
     except Exception as e:
         db.session.rollback()
+        print(f"Profile update error: {str(e)}")
         return jsonify({'msg': 'Profile update failed', 'error': str(e)}), 500
 
 @profile_bp.route('/image', methods=['OPTIONS'])
