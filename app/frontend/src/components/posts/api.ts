@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/posts';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export interface PostListParams {
   page?: number;
@@ -24,7 +24,7 @@ export interface PostListResponse {
 
 export const postsApi = {
   createPost: async (formData: FormData) => {
-    const response = await fetch(`${API_URL}/`, {
+    const response = await fetch(`${API_URL}/api/posts/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -45,7 +45,7 @@ export const postsApi = {
     if (params.tag) searchParams.append('tag', params.tag);
     if (params.sort) searchParams.append('sort', params.sort);
 
-    const response = await fetch(`${API_URL}/?${searchParams.toString()}`, {
+    const response = await fetch(`${API_URL}/api/posts/?${searchParams.toString()}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
@@ -54,7 +54,7 @@ export const postsApi = {
   },
 
   getCategories: async (): Promise<{ categories: string[] }> => {
-    const response = await fetch(`${API_URL}/categories`, {
+    const response = await fetch(`${API_URL}/api/posts/categories`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
@@ -63,7 +63,7 @@ export const postsApi = {
   },
 
   getPopularTags: async (): Promise<{ tags: string[] }> => {
-    const response = await fetch(`${API_URL}/popular-tags`, {
+    const response = await fetch(`${API_URL}/api/posts/popular-tags`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
@@ -72,7 +72,7 @@ export const postsApi = {
   },
 
   likePost: async (postId: number) => {
-    const response = await fetch(`${API_URL}/${postId}/like`, {
+    const response = await fetch(`${API_URL}/api/posts/${postId}/like`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,

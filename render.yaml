@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: prok-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r app/backend/requirements.txt
+    startCommand: cd app/backend && gunicorn --config gunicorn.conf.py main:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.18
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: https://your-frontend-url.onrender.com,http://localhost:5173
+    disk:
+      name: uploads
+      mountPath: /opt/render/project/src/app/backend/uploads
+      sizeGB: 1 

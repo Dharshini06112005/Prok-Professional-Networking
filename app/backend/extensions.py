@@ -3,18 +3,21 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import os
 
 # Initialize extensions
 db = SQLAlchemy()
 jwt = JWTManager()
 
-# CORS configuration - allow all Vite dev ports for local development
+# CORS configuration - allow production origins from environment variables
+ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,https://your-frontend-url.onrender.com').split(',')
+
 cors = CORS(
-    origins=[f"http://localhost:{port}" for port in range(5173, 5181)],
+    origins=ALLOWED_ORIGINS,
+    methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
     supports_credentials=True,
-    allow_headers=["Content-Type", "Authorization", "Accept"],
-    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    expose_headers=["Content-Type", "Authorization"]
+    max_age=3600
 )
 
 limiter = Limiter(
