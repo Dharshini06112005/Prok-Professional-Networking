@@ -22,7 +22,7 @@ async function handleTokenExpiry(response: Response) {
   }
 }
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://prok-professional-networking-t19l.onrender.com";
 
 export const profileApi = {
   getProfile: async () => {
