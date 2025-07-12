@@ -1,7 +1,7 @@
 from flask import Flask
-from app.backend.config import Config
-from app.backend.extensions import init_extensions, db
-from app.backend.api import auth, feed, jobs, messaging, posts, profile
+from config import Config
+from extensions import init_extensions, db
+from api import auth, feed, jobs, messaging, posts, profile
 
 def create_app(config_class=Config):
     """Application factory pattern"""

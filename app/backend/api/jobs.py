@@ -1,4 +1,7 @@
-from flask import Blueprint
+from flask import Blueprint, request, jsonify
+from extensions import db
+from models.job import Job
+from models.user import User
 
 jobs_bp = Blueprint('jobs', __name__)
 

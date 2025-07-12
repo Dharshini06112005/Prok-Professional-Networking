@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify, send_from_directory
+from flask import Blueprint, request, jsonify, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.backend.extensions import db
-from app.backend.models.user import User
-from app.backend.models.post import Post
+from extensions import db
+from models.user import User
+from models.post import Post
 import os, time
 from werkzeug.utils import secure_filename
 from PIL import Image
