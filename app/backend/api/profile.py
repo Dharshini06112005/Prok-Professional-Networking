@@ -64,7 +64,7 @@ def get_profile():
 @jwt_required()
 def update_profile():
     import ast
-    import json as pyjson
+    import json
     try:
         email = get_jwt_identity()
         user = User.query.filter_by(email=email).first()

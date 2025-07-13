@@ -48,72 +48,77 @@ def invalidate_cache():
 @posts_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_post():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({'msg': 'User not found'}), 404
-    
-    title = request.form.get('title', '').strip()
-    if not title:
-        return jsonify({'msg': 'Title is required'}), 400
-    
-    allow_comments = request.form.get('allow_comments', 'true').lower() == 'true'
-    is_public = request.form.get('is_public', 'true').lower() == 'true'
-    content = request.form.get('content', '').strip()
-    category = request.form.get('category', '').strip()
-    tags = request.form.get('tags', '').strip()
-    
-    if not content:
-        return jsonify({'msg': 'Content is required'}), 400
-    
-    media_url = None
-    media_type = None
-    if 'media' in request.files:
-        file = request.files['media']
-        if file.filename == '':
-            return jsonify({'msg': 'No selected file'}), 400
-        if not allowed_file(file.filename):
-            return jsonify({'msg': 'Invalid file type'}), 400
-        file.seek(0, os.SEEK_END)
-        file_length = file.tell()
-        file.seek(0)
-        if file_length > MAX_FILE_SIZE:
-            return jsonify({'msg': 'File too large'}), 400
-        ext = file.filename.rsplit('.', 1)[1].lower() if file.filename and '.' in file.filename else ''
-        # If image, always save as jpg
-        if is_image(file.filename):
-            filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.jpg")
-            compress_and_save_image(file, filename)
-            media_type = 'image/jpeg'
-            media_url = f'/api/posts/media/{filename}'
-        else:
-            filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.{ext}")
-            file.save(os.path.join(MEDIA_FOLDER, filename))
-            # Set media type based on file extension
-            if ext in ['mp4', 'webm', 'avi', 'mov']:
-                media_type = f'video/{ext}'
+    try:
+        email = get_jwt_identity()
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({'msg': 'User not found'}), 404
+        
+        title = request.form.get('title', '').strip()
+        if not title:
+            return jsonify({'msg': 'Title is required'}), 400
+        
+        allow_comments = request.form.get('allow_comments', 'true').lower() == 'true'
+        is_public = request.form.get('is_public', 'true').lower() == 'true'
+        content = request.form.get('content', '').strip()
+        category = request.form.get('category', '').strip()
+        tags = request.form.get('tags', '').strip()
+        
+        if not content:
+            return jsonify({'msg': 'Content is required'}), 400
+        
+        media_url = None
+        media_type = None
+        if 'media' in request.files:
+            file = request.files['media']
+            if file.filename == '':
+                return jsonify({'msg': 'No selected file'}), 400
+            if not allowed_file(file.filename):
+                return jsonify({'msg': 'Invalid file type'}), 400
+            file.seek(0, os.SEEK_END)
+            file_length = file.tell()
+            file.seek(0)
+            if file_length > MAX_FILE_SIZE:
+                return jsonify({'msg': 'File too large'}), 400
+            ext = file.filename.rsplit('.', 1)[1].lower() if file.filename and '.' in file.filename else ''
+            # If image, always save as jpg
+            if is_image(file.filename):
+                filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.jpg")
+                compress_and_save_image(file, filename)
+                media_type = 'image/jpeg'
+                media_url = f'/api/posts/media/{filename}'
             else:
-                media_type = 'application/octet-stream'
-            media_url = f'/api/posts/media/{filename}'
-    
-    post = Post(
-        user_email=email, 
-        title=title, 
-        content=content, 
-        media_url=media_url, 
-        media_type=media_type,
-        allow_comments=allow_comments, 
-        is_public=is_public,
-        category=category if category else None,
-        tags=tags if tags else None
-    )
-    db.session.add(post)
-    db.session.commit()
-    
-    # Invalidate cache when new post is created
-    invalidate_cache()
-    
-    return jsonify(post.to_dict()), 201
+                filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.{ext}")
+                file.save(os.path.join(MEDIA_FOLDER, filename))
+                # Set media type based on file extension
+                if ext in ['mp4', 'webm', 'avi', 'mov']:
+                    media_type = f'video/{ext}'
+                else:
+                    media_type = 'application/octet-stream'
+                media_url = f'/api/posts/media/{filename}'
+        
+        post = Post(
+            user_email=email, 
+            title=title, 
+            content=content, 
+            media_url=media_url, 
+            media_type=media_type,
+            allow_comments=allow_comments, 
+            is_public=is_public,
+            category=category if category else None,
+            tags=tags if tags else None
+        )
+        db.session.add(post)
+        db.session.commit()
+        
+        # Invalidate cache when new post is created
+        invalidate_cache()
+        
+        return jsonify(post.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        print(f"Post creation error: {str(e)}")
+        return jsonify({'msg': 'Post creation failed', 'error': str(e)}), 500
 
 @posts_bp.route('', methods=['POST', 'OPTIONS'])
 @jwt_required()
