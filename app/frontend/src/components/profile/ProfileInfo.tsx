@@ -11,25 +11,25 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode }>
   return (
     <div className="mb-4 section-fade-in">
       <button
-        className="w-full text-left font-semibold py-2 px-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded hover:bg-blue-200 transition-colors duration-200 flex justify-between items-center"
+        className="w-full text-left font-semibold py-2 px-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded hover:bg-blue-200 transition-colors duration-200 flex justify-between items-center text-black"
         onClick={() => setOpen((o) => !o)}
       >
-        <span>{title}</span>
-        <span className={`transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`}>{open ? "▲" : "▼"}</span>
+        <span className="text-black">{title}</span>
+        <span className={`transition-transform duration-300 text-black ${open ? "rotate-180" : "rotate-0"}`}>{open ? "▲" : "▼"}</span>
       </button>
       <div
         className={`collapsible-content transition-all duration-500 ease-in-out overflow-hidden ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
       >
-        {open && <div className="p-4">{children}</div>}
+        {open && <div className="p-4 text-black">{children}</div>}
       </div>
     </div>
   );
 };
 
 const ProfileInfo: React.FC<Props> = ({ user }) => (
-  <div className="mt-4">
+  <div className="mt-4 text-black">
     <CollapsibleSection title="Bio">
-      <p className="animate-fade-in-slow">{user.bio}</p>
+      <p className="animate-fade-in-slow text-black">{user.bio}</p>
     </CollapsibleSection>
     <CollapsibleSection title="Skills">
       <div className="flex flex-wrap gap-2">
@@ -42,26 +42,26 @@ const ProfileInfo: React.FC<Props> = ({ user }) => (
     </CollapsibleSection>
     <CollapsibleSection title="Experience">
       {user.experience.map((exp, idx) => (
-        <div key={idx} className="experience-item animate-fade-in-slow">
-          <div className="experience-title">{exp.title} @ {exp.company}</div>
-          <div className="experience-dates">{exp.startDate} - {exp.endDate || "Present"}</div>
-          <div className="experience-description">{exp.description}</div>
+        <div key={idx} className="experience-item animate-fade-in-slow text-black">
+          <div className="experience-title text-black">{exp.title} @ {exp.company}</div>
+          <div className="experience-dates text-black">{exp.startDate} - {exp.endDate || "Present"}</div>
+          <div className="experience-description text-black">{exp.description}</div>
         </div>
       ))}
     </CollapsibleSection>
     <CollapsibleSection title="Education">
       {user.education.map((edu, idx) => (
-        <div key={idx} className="education-item animate-fade-in-slow">
-          <div className="education-degree">{edu.degree} in {edu.field}</div>
-          <div className="education-school">{edu.school}</div>
-          <div className="education-dates">{edu.startDate} - {edu.endDate}</div>
+        <div key={idx} className="education-item animate-fade-in-slow text-black">
+          <div className="education-degree text-black">{edu.degree} in {edu.field}</div>
+          <div className="education-school text-black">{edu.school}</div>
+          <div className="education-dates text-black">{edu.startDate} - {edu.endDate}</div>
         </div>
       ))}
     </CollapsibleSection>
     <CollapsibleSection title="Contact">
-      <div className="animate-fade-in-slow">Email: {user.contact.email}</div>
-      {user.contact.phone && <div className="animate-fade-in-slow">Phone: {user.contact.phone}</div>}
-      {user.contact.website && <div className="animate-fade-in-slow">Website: <a href={user.contact.website} className="text-blue-500 underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">{user.contact.website}</a></div>}
+      <div className="animate-fade-in-slow text-black">Email: {user.contact.email}</div>
+      {user.contact.phone && <div className="animate-fade-in-slow text-black">Phone: {user.contact.phone}</div>}
+      {user.contact.website && <div className="animate-fade-in-slow text-black">Website: <a href={user.contact.website} className="text-blue-500 underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">{user.contact.website}</a></div>}
     </CollapsibleSection>
   </div>
 );

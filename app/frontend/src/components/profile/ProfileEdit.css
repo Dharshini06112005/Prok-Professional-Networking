@@ -1,20 +1,26 @@
 .profile-edit-form {
   animation: fadeIn 0.8s cubic-bezier(.4,0,.2,1);
 }
+
 .input-floating {
   width: 100%;
   padding: 1.1rem 0.8rem 0.4rem 0.8rem;
   border: 1.5px solid #d1d5db;
   border-radius: 0.7rem;
-  background: #f9fafb;
+  background: #ffffff !important;
   font-size: 1rem;
   outline: none;
   transition: border 0.2s, box-shadow 0.2s;
+  color: #000000 !important;
 }
+
 .input-floating:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px #dbeafe;
+  background: #ffffff !important;
+  color: #000000 !important;
 }
+
 .floating-label {
   position: absolute;
   left: 1rem;
@@ -24,6 +30,7 @@
   pointer-events: none;
   transition: all 0.2s;
 }
+
 .input-floating:focus + .floating-label,
 .input-floating:not(:placeholder-shown) + .floating-label {
   top: -0.7rem;
@@ -33,18 +40,53 @@
   background: #fff;
   padding: 0 0.3rem;
 }
+
+/* Ensure all text in profile is black and visible */
+.profile-edit-form input,
+.profile-edit-form textarea,
+.profile-edit-form select {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+.profile-edit-form input::placeholder,
+.profile-edit-form textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+.profile-edit-form label {
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+.profile-edit-form h2,
+.profile-edit-form h3,
+.profile-edit-form h4 {
+  color: #000000 !important;
+}
+
+.profile-edit-form p {
+  color: #000000 !important;
+}
+
+.profile-edit-form span {
+  color: #000000 !important;
+}
+
 .error-message {
   color: #ef4444;
   font-size: 0.95rem;
   margin-top: 0.2rem;
   animation: shake 0.4s;
 }
+
 @keyframes shake {
   10%, 90% { transform: translateX(-2px); }
   20%, 80% { transform: translateX(4px); }
   30%, 50%, 70% { transform: translateX(-8px); }
   40%, 60% { transform: translateX(8px); }
 }
+
 .btn-animated {
   background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
   color: #fff;
@@ -55,9 +97,11 @@
   transition: background 0.2s, transform 0.2s;
   margin-top: 1rem;
 }
+
 .btn-animated:active {
   transform: scale(0.97);
 }
+
 .loader {
   border: 3px solid #e5e7eb;
   border-top: 3px solid #2563eb;
@@ -67,18 +111,22 @@
   animation: spin 0.8s linear infinite;
   display: inline-block;
 }
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
 .success-check {
   color: #22c55e;
   font-size: 1.3rem;
   animation: pop 0.4s;
 }
+
 @keyframes pop {
   0% { transform: scale(0.7); opacity: 0.5; }
   100% { transform: scale(1); opacity: 1; }
 }
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -88,6 +136,7 @@
 .btn-add {
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #ffffff !important;
 }
 
 .btn-add:hover {
@@ -105,7 +154,7 @@
   transition: all 0.3s ease;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  background: #f9fafb;
+  background: #ffffff !important;
   padding: 1rem;
   margin-bottom: 1rem;
 }
@@ -117,17 +166,38 @@
   transform: translateY(-2px);
 }
 
+/* Ensure all text in cards is black */
+.experience-card input,
+.experience-card textarea,
+.education-card input,
+.education-card textarea {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+.experience-card label,
+.education-card label {
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+.experience-card h4,
+.education-card h4 {
+  color: #000000 !important;
+}
+
 /* Remove button styling */
 .btn-remove {
   transition: all 0.2s ease;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.875rem;
+  color: #dc2626 !important;
 }
 
 .btn-remove:hover {
   background-color: #fee2e2;
-  color: #dc2626;
+  color: #dc2626 !important;
   transform: scale(1.05);
 }
 

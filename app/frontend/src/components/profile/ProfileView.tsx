@@ -43,15 +43,31 @@ const ProfileView: React.FC = () => {
     navigate('/login');
   };
 
-  if (loading) return <div className="text-center mt-8">Loading...</div>;
-  if (error) return <div className="text-center text-red-500 mt-8">{error}</div>;
-  if (!user) return <div className="text-center mt-8">No profile found.</div>;
+  if (loading) return (
+    <div className="text-center mt-8 text-black">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+      <p className="mt-2 text-black">Loading profile...</p>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="text-center text-red-500 mt-8">
+      <p className="text-black">Error loading profile</p>
+      <p className="text-red-500">{error}</p>
+    </div>
+  );
+  
+  if (!user) return (
+    <div className="text-center mt-8 text-black">
+      <p>No profile found.</p>
+    </div>
+  );
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
+    <div className="max-w-2xl mx-auto mt-8 text-black">
       <ProfileHeader user={user} />
       <div className="flex justify-between mt-2">
-        <button className="btn" onClick={() => setEditing((e) => !e)}>
+        <button className="btn text-black" onClick={() => setEditing((e) => !e)}>
           {editing ? "Cancel" : "Edit Profile"}
         </button>
         <button
