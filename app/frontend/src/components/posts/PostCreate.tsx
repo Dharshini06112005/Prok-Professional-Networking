@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = 'https://prok-professional-networking-t19l.onrender.com/api/posts/';
+import { postsApi } from './api';
 
 const PostCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -51,9 +50,14 @@ const PostCreate: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    
+    // Prevent double submission
+    if (loading) return;
+    
     setLoading(true);
     setError(null);
     setSuccess(false);
+    
     try {
       const formData = new FormData();
       formData.append('title', title);
@@ -61,17 +65,9 @@ const PostCreate: React.FC = () => {
       formData.append('allow_comments', allowComments.toString());
       formData.append('is_public', isPublic.toString());
       if (media) formData.append('media', media);
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
-        },
-        body: formData,
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.msg || 'Failed to create post');
-      }
+      
+      const result = await postsApi.createPost(formData);
+      
       setSuccess(true);
       setTitle('');
       setContent('');
@@ -86,7 +82,8 @@ const PostCreate: React.FC = () => {
         navigate('/posts');
       }, 1500);
     } catch (err: any) {
-      setError(err.message);
+      console.error('Post creation error:', err);
+      setError(err.message || 'Failed to create post - please try again');
     } finally {
       setLoading(false);
       setTimeout(() => setSuccess(false), 2000);

@@ -106,8 +106,8 @@ const Login: React.FC = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
+                className={`form-input ${
+                  errors.email ? 'error' : ''
                 }`}
                 placeholder="Enter your email"
               />
@@ -129,8 +129,8 @@ const Login: React.FC = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
+                className={`form-input ${
+                  errors.password ? 'error' : ''
                 }`}
                 placeholder="Enter your password"
               />
