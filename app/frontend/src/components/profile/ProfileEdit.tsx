@@ -13,7 +13,13 @@ const validateEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
-  const [form, setForm] = useState(user);
+  const [form, setForm] = useState({
+    ...user,
+    skills: user.skills || [],
+    experience: user.experience || [],
+    education: user.education || [],
+    contact: user.contact || { email: '' }
+  });
   const [skillInput, setSkillInput] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [submitting, setSubmitting] = useState(false);
@@ -36,50 +42,59 @@ const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
   const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Enter" || e.key === ",") && skillInput.trim()) {
       e.preventDefault();
-      if (!form.skills.includes(skillInput.trim())) {
-        setForm({ ...form, skills: [...form.skills, skillInput.trim()] });
+      const currentSkills = form.skills || [];
+      if (!currentSkills.includes(skillInput.trim())) {
+        setForm({ ...form, skills: [...currentSkills, skillInput.trim()] });
       }
       setSkillInput("");
-    } else if (e.key === "Backspace" && !skillInput && form.skills.length > 0) {
-      setForm({ ...form, skills: form.skills.slice(0, -1) });
+    } else if (e.key === "Backspace" && !skillInput && (form.skills || []).length > 0) {
+      const currentSkills = form.skills || [];
+      setForm({ ...form, skills: currentSkills.slice(0, -1) });
     }
   };
 
   const removeSkill = (skill: string) => {
-    setForm({ ...form, skills: form.skills.filter((s) => s !== skill) });
+    const currentSkills = form.skills || [];
+    setForm({ ...form, skills: currentSkills.filter((s) => s !== skill) });
   };
   // --- End skills logic ---
 
   // --- Experience editing logic ---
   const addExperience = () => {
     const newExp = { title: "", company: "", startDate: "", endDate: "", description: "" };
-    setForm({ ...form, experience: [...form.experience, newExp] });
+    const currentExperience = form.experience || [];
+    setForm({ ...form, experience: [...currentExperience, newExp] });
   };
 
   const updateExperience = (index: number, field: string, value: string) => {
-    const updatedExp = [...form.experience];
+    const currentExperience = form.experience || [];
+    const updatedExp = [...currentExperience];
     updatedExp[index] = { ...updatedExp[index], [field]: value };
     setForm({ ...form, experience: updatedExp });
   };
 
   const removeExperience = (index: number) => {
-    setForm({ ...form, experience: form.experience.filter((_, i) => i !== index) });
+    const currentExperience = form.experience || [];
+    setForm({ ...form, experience: currentExperience.filter((_, i) => i !== index) });
   };
 
   // --- Education editing logic ---
   const addEducation = () => {
     const newEdu = { degree: "", field: "", school: "", startDate: "", endDate: "" };
-    setForm({ ...form, education: [...form.education, newEdu] });
+    const currentEducation = form.education || [];
+    setForm({ ...form, education: [...currentEducation, newEdu] });
   };
 
   const updateEducation = (index: number, field: string, value: string) => {
-    const updatedEdu = [...form.education];
+    const currentEducation = form.education || [];
+    const updatedEdu = [...currentEducation];
     updatedEdu[index] = { ...updatedEdu[index], [field]: value };
     setForm({ ...form, education: updatedEdu });
   };
 
   const removeEducation = (index: number) => {
-    setForm({ ...form, education: form.education.filter((_, i) => i !== index) });
+    const currentEducation = form.education || [];
+    setForm({ ...form, education: currentEducation.filter((_, i) => i !== index) });
   };
 
   const validate = () => {
@@ -109,7 +124,7 @@ const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
       try {
         console.log('Saving profile...');
         // Always send skills as a flat array
-        const updated = await profileApi.updateProfile({ ...form, skills: form.skills });
+        const updated = await profileApi.updateProfile({ ...form, skills: form.skills || [] });
         console.log('Profile saved successfully:', updated);
         onSave(updated);
         setSuccess(true);
@@ -133,7 +148,7 @@ const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
         {errors.name && <div className="error-message animate-shake">{errors.name}</div>}
       </div>
       <div className="mb-4 relative">
-        <input name="email" value={form.contact.email} onChange={e => setForm({ ...form, contact: { ...form.contact, email: e.target.value } })} className="input-floating peer" required />
+        <input name="email" value={form.contact?.email || ''} onChange={e => setForm({ ...form, contact: { ...form.contact, email: e.target.value } })} className="input-floating peer" required />
         <label className="floating-label">Email</label>
         {errors.email && <div className="error-message animate-shake">{errors.email}</div>}
       </div>
@@ -150,7 +165,7 @@ const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Skills</label>
         <div className="flex flex-wrap gap-2 mb-2">
-          {form.skills.map((skill) => (
+          {(form.skills || []).map((skill) => (
             <span key={skill} className="skill-chip bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold shadow hover:bg-blue-200 hover:scale-110 transition-all duration-200 cursor-pointer flex items-center">
               {skill}
               <button type="button" className="ml-2 text-blue-500 hover:text-red-500" onClick={() => removeSkill(skill)} title="Remove skill">&times;</button>
@@ -175,7 +190,7 @@ const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
             + Add Experience
           </button>
         </div>
-        {form.experience.map((exp, index) => (
+        {(form.experience || []).map((exp, index) => (
           <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-semibold text-gray-700">Experience #{index + 1}</h4>
@@ -247,7 +262,7 @@ const ProfileEdit: React.FC<Props> = ({ user, onSave }) => {
             + Add Education
           </button>
         </div>
-        {form.education.map((edu, index) => (
+        {(form.education || []).map((edu, index) => (
           <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-semibold text-gray-700">Education #{index + 1}</h4>
