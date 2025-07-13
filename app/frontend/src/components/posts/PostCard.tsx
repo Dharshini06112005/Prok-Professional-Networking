@@ -128,7 +128,7 @@ const PostCard: React.FC<PostCardProps & { onDelete?: (id: number) => void }> = 
       <div className="flex flex-wrap gap-2 text-xs text-black mt-2">
         <span>By {post.user.name}</span>
         {post.category && <span>| {post.category}</span>}
-        {post.tags && post.tags.length > 0 && (
+        {post.tags && Array.isArray(post.tags) && post.tags.length > 0 && (
           <span>| {post.tags.map(tag => `#${tag}`).join(' ')}</span>
         )}
         <span>| {post.is_public ? 'Public' : 'Private'}</span>

@@ -29,11 +29,11 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode }>
 const ProfileInfo: React.FC<Props> = ({ user }) => (
   <div className="mt-4 text-black">
     <CollapsibleSection title="Bio">
-      <p className="animate-fade-in-slow text-black">{user.bio}</p>
+      <p className="animate-fade-in-slow text-black">{user.bio || 'No bio available'}</p>
     </CollapsibleSection>
     <CollapsibleSection title="Skills">
       <div className="flex flex-wrap gap-2">
-        {user.skills.map((skill) => (
+        {(user.skills || []).map((skill) => (
           <span key={skill} className="skill-chip bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold shadow hover:bg-blue-200 hover:scale-110 transition-all duration-200 cursor-pointer">
             {skill}
           </span>
@@ -41,7 +41,7 @@ const ProfileInfo: React.FC<Props> = ({ user }) => (
       </div>
     </CollapsibleSection>
     <CollapsibleSection title="Experience">
-      {user.experience.map((exp, idx) => (
+      {(user.experience || []).map((exp, idx) => (
         <div key={idx} className="experience-item animate-fade-in-slow text-black">
           <div className="experience-title text-black">{exp.title} @ {exp.company}</div>
           <div className="experience-dates text-black">{exp.startDate} - {exp.endDate || "Present"}</div>
@@ -50,7 +50,7 @@ const ProfileInfo: React.FC<Props> = ({ user }) => (
       ))}
     </CollapsibleSection>
     <CollapsibleSection title="Education">
-      {user.education.map((edu, idx) => (
+      {(user.education || []).map((edu, idx) => (
         <div key={idx} className="education-item animate-fade-in-slow text-black">
           <div className="education-degree text-black">{edu.degree} in {edu.field}</div>
           <div className="education-school text-black">{edu.school}</div>
@@ -59,9 +59,9 @@ const ProfileInfo: React.FC<Props> = ({ user }) => (
       ))}
     </CollapsibleSection>
     <CollapsibleSection title="Contact">
-      <div className="animate-fade-in-slow text-black">Email: {user.contact.email}</div>
-      {user.contact.phone && <div className="animate-fade-in-slow text-black">Phone: {user.contact.phone}</div>}
-      {user.contact.website && <div className="animate-fade-in-slow text-black">Website: <a href={user.contact.website} className="text-blue-500 underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">{user.contact.website}</a></div>}
+      <div className="animate-fade-in-slow text-black">Email: {user.contact?.email || 'No email available'}</div>
+      {user.contact?.phone && <div className="animate-fade-in-slow text-black">Phone: {user.contact.phone}</div>}
+      {user.contact?.website && <div className="animate-fade-in-slow text-black">Website: <a href={user.contact.website} className="text-blue-500 underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">{user.contact.website}</a></div>}
     </CollapsibleSection>
   </div>
 );
