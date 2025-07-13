@@ -87,8 +87,8 @@ const PostCard: React.FC<PostCardProps & { onDelete?: (id: number) => void }> = 
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex justify-between items-center mb-2">
-        <div className="font-bold text-lg">{post.title}</div>
-        <div className="text-xs text-gray-500">{new Date(post.created_at).toLocaleString()}</div>
+        <div className="font-bold text-lg text-black">{post.title}</div>
+        <div className="text-xs text-black">{new Date(post.created_at).toLocaleString()}</div>
         {user && user.email === post.user?.email && (
           <button
             onClick={handleDelete}
@@ -99,7 +99,7 @@ const PostCard: React.FC<PostCardProps & { onDelete?: (id: number) => void }> = 
           </button>
         )}
       </div>
-      <div className="mb-2 text-gray-700" dangerouslySetInnerHTML={{ __html: post.content }} />
+      <div className="mb-2 text-black" dangerouslySetInnerHTML={{ __html: post.content }} />
       {/* Media Display */}
       {mediaSrc && isImage && (
         <div className="my-2">
@@ -125,7 +125,7 @@ const PostCard: React.FC<PostCardProps & { onDelete?: (id: number) => void }> = 
           </video>
         </div>
       )}
-      <div className="flex flex-wrap gap-2 text-xs text-gray-500 mt-2">
+      <div className="flex flex-wrap gap-2 text-xs text-black mt-2">
         <span>By {post.user.name}</span>
         {post.category && <span>| {post.category}</span>}
         {post.tags && post.tags.length > 0 && (

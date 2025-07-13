@@ -76,14 +76,14 @@ const Login: React.FC = () => {
         {/* Logo/Brand Section */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-indigo-600 mb-2">Prok</h1>
-          <p className="text-gray-600">Professional Networking Platform</p>
+          <p className="text-black">Professional Networking Platform</p>
         </div>
 
         {/* Login Form */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
-            <p className="text-gray-600">Sign in to your account</p>
+            <h2 className="text-3xl font-bold text-black mb-2">Welcome back</h2>
+            <p className="text-black">Sign in to your account</p>
           </div>
 
           {feedback && (
@@ -95,7 +95,7 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
                 Email address
               </label>
               <input
@@ -118,7 +118,7 @@ const Login: React.FC = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
                 Password
               </label>
               <input
@@ -148,7 +148,7 @@ const Login: React.FC = () => {
                   type="checkbox"
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-black">
                   Remember me
                 </label>
               </div>
@@ -181,7 +181,7 @@ const Login: React.FC = () => {
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-black">
               Don't have an account?{' '}
               <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
                 Sign up here
@@ -191,7 +191,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-sm text-gray-500">
+        <div className="text-center text-sm text-black">
           <p>&copy; 2024 Prok. All rights reserved.</p>
         </div>
       </div>

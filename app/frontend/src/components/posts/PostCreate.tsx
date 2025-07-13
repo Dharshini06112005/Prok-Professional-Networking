@@ -113,23 +113,23 @@ const PostCreate: React.FC = () => {
           </div>
         </div>
         <div className="mb-4">
-          <label className="block font-medium mb-1">Title</label>
+          <label className="block font-medium mb-1 text-black">Title</label>
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 text-black bg-white"
             placeholder="Enter post title"
             required
           />
         </div>
         <div className="mb-4">
-          <label className="block font-medium mb-1">Content</label>
+          <label className="block font-medium mb-1 text-black">Content</label>
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
             placeholder="What's on your mind?"
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 min-h-[200px] resize-y"
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 min-h-[200px] resize-y text-black bg-white"
             required
           />
         </div>
@@ -183,10 +183,10 @@ const PostCreate: React.FC = () => {
         {error && <div className="text-red-500 mb-2 animate-shake">{error}</div>}
         {/* Preview Section */}
         <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-2">Preview</h3>
+          <h3 className="text-lg font-semibold mb-2 text-black">Preview</h3>
           <div className="border rounded p-4 bg-gray-50">
-            <div className="font-bold text-lg mb-2">{title}</div>
-            <div className="whitespace-pre-wrap">{content}</div>
+            <div className="font-bold text-lg mb-2 text-black">{title}</div>
+            <div className="whitespace-pre-wrap text-black">{content}</div>
             {mediaPreview && (
               <div className="mt-2">
                 {media?.type.startsWith('image') ? (
@@ -196,7 +196,7 @@ const PostCreate: React.FC = () => {
                 )}
               </div>
             )}
-            <div className="mt-2 text-xs text-gray-500">
+            <div className="mt-2 text-xs text-black">
               {allowComments ? 'Comments allowed' : 'Comments disabled'} | {isPublic ? 'Public' : 'Private'}
             </div>
           </div>

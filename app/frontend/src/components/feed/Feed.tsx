@@ -30,10 +30,10 @@ const Feed: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="space-y-6">
-        {loading && <div className="text-center py-8">Loading feed...</div>}
+        {loading && <div className="text-center py-8 text-black">Loading feed...</div>}
         {error && <div className="text-center text-red-500 py-8">{error}</div>}
         {!loading && !error && posts.length === 0 && (
-          <div className="text-center text-gray-500 py-8">No posts found.</div>
+          <div className="text-center text-black py-8">No posts found.</div>
         )}
         {posts.map(post => (
           <PostCard key={post.id} post={post} onDelete={id => setPosts(prev => prev.filter(p => p.id !== id))} />

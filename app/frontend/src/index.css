@@ -5,35 +5,73 @@
 /* Custom styles can be added below */
 @layer base {
   body {
-    @apply text-gray-900 bg-white dark:bg-gray-900 dark:text-white;
+    @apply text-black bg-white;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+  }
+  
+  /* Ensure all text is black and visible */
+  * {
+    color: #000000 !important;
   }
   
   /* Ensure text is visible in input fields */
   input, textarea, select {
-    @apply text-gray-900 bg-white;
-    color: #111827 !important;
+    @apply text-black bg-white;
+    color: #000000 !important;
     background-color: #ffffff !important;
-  }
-  
-  /* Dark mode support */
-  .dark input, .dark textarea, .dark select {
-    @apply text-white bg-gray-800;
-    color: #ffffff !important;
-    background-color: #1f2937 !important;
   }
   
   /* Focus states */
   input:focus, textarea:focus, select:focus {
     @apply outline-none ring-2 ring-blue-500 border-transparent;
+    color: #000000 !important;
+    background-color: #ffffff !important;
   }
   
   /* Placeholder text */
   input::placeholder, textarea::placeholder {
     @apply text-gray-500;
+    color: #6b7280 !important;
   }
   
-  .dark input::placeholder, .dark textarea::placeholder {
-    @apply text-gray-400;
+  /* Ensure all headings are black */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+  }
+  
+  /* Ensure all paragraphs are black */
+  p {
+    color: #000000 !important;
+  }
+  
+  /* Ensure all spans are black */
+  span {
+    color: #000000 !important;
+  }
+  
+  /* Ensure all labels are black */
+  label {
+    color: #000000 !important;
+  }
+  
+  /* Ensure all divs have black text */
+  div {
+    color: #000000 !important;
+  }
+  
+  /* Ensure all buttons have proper text color */
+  button {
+    color: inherit !important;
+  }
+  
+  /* Ensure links are visible */
+  a {
+    color: #2563eb !important;
+  }
+  
+  a:hover {
+    color: #1d4ed8 !important;
   }
 }
 
@@ -48,19 +86,81 @@
     @apply text-white bg-secondary hover:bg-secondary/90;
   }
   .input {
-    @apply px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900 bg-white;
+    @apply px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-black bg-white;
+    color: #000000 !important;
+    background-color: #ffffff !important;
   }
   
   /* Form input styles */
   .form-input {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900 bg-white;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-black bg-white;
+    color: #000000 !important;
+    background-color: #ffffff !important;
   }
   
   .form-input:focus {
     @apply border-blue-500;
+    color: #000000 !important;
+    background-color: #ffffff !important;
   }
   
   .form-input.error {
     @apply border-red-500;
+  }
+  
+  /* Ensure all text in components is black */
+  .text-black {
+    color: #000000 !important;
+  }
+  
+  .text-gray-900 {
+    color: #000000 !important;
+  }
+  
+  .text-gray-800 {
+    color: #000000 !important;
+  }
+  
+  .text-gray-700 {
+    color: #000000 !important;
+  }
+  
+  .text-gray-600 {
+    color: #000000 !important;
+  }
+  
+  .text-gray-500 {
+    color: #6b7280 !important;
+  }
+  
+  /* Keep error messages red */
+  .text-red-500 {
+    color: #ef4444 !important;
+  }
+  
+  .text-red-600 {
+    color: #dc2626 !important;
+  }
+  
+  /* Keep success messages green */
+  .text-green-600 {
+    color: #16a34a !important;
+  }
+  
+  /* Keep blue links */
+  .text-blue-600 {
+    color: #2563eb !important;
+  }
+  
+  .text-blue-700 {
+    color: #1d4ed8 !important;
+  }
+  
+  .text-indigo-600 {
+    color: #2563eb !important;
+  }
+  
+  .text-indigo-700 {
+    color: #1d4ed8 !important;
   }
 }

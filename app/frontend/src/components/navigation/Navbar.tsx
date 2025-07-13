@@ -20,29 +20,29 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/profile" className="text-xl font-bold text-gray-800 hover:text-blue-600">
+            <Link to="/profile" className="text-xl font-bold text-black hover:text-blue-600">
               Prok
             </Link>
             <div className="ml-10 flex items-baseline space-x-4">
-              <Link to="/profile" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link to="/profile" className="text-black hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                 Profile
               </Link>
-              <Link to="/feed" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link to="/feed" className="text-black hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                 Feed
               </Link>
-              <Link to="/posts/create" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link to="/posts/create" className="text-black hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                 Posts
               </Link>
-              <Link to="/jobs" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link to="/jobs" className="text-black hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                 Jobs
               </Link>
-              <Link to="/messages" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link to="/messages" className="text-black hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                 Messages
               </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-700 text-sm">
+            <span className="text-black text-sm">
               Welcome, {user?.username || user?.email}
             </span>
             <button
