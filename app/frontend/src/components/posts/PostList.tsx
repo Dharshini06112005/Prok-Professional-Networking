@@ -65,14 +65,28 @@ const PostList = forwardRef<PostListRef>((props, ref) => {
         sort: debouncedSort,
       });
       
-      if (reset) {
-        setPosts(data.posts);
-      } else {
-        setPosts(prev => [...prev, ...data.posts]);
+      // Add comprehensive safety checks
+      if (!data) {
+        throw new Error('No data received from server');
       }
-      setHasMore(data.posts.length === PAGE_SIZE);
+      
+      const postsArray = data.posts || [];
+      const hasMorePosts = postsArray.length === PAGE_SIZE;
+      
+      if (reset) {
+        setPosts(postsArray);
+      } else {
+        setPosts(prev => [...prev, ...postsArray]);
+      }
+      setHasMore(hasMorePosts);
     } catch (err: any) {
-      setError(err.message);
+      console.error('Posts fetch error:', err);
+      setError(err.message || 'Failed to load posts');
+      // Set empty arrays to prevent map errors
+      if (reset) {
+        setPosts([]);
+      }
+      setHasMore(false);
     } finally {
       setLoading(false);
       setInitialLoad(false);
@@ -148,16 +162,16 @@ const PostList = forwardRef<PostListRef>((props, ref) => {
       <div className="space-y-4 min-h-[300px]">
         {initialLoad && <SkeletonLoader count={3} />}
         {error && <div className="text-red-500 text-center">{error}</div>}
-        {!loading && !error && posts.length === 0 && (
+        {!loading && !error && (posts || []).length === 0 && (
           <div className="text-center text-gray-500 py-8">No posts found.</div>
         )}
-        {posts.map(post => (
+        {(posts || []).map(post => (
           <div key={post.id} onClick={e => {
             // Prevent navigation if delete button is clicked
             if ((e.target as HTMLElement).closest('button')) return;
             navigate(`/posts/${post.id}`);
           }} style={{ cursor: 'pointer' }}>
-            <PostCard post={post} onDelete={id => setPosts(prev => prev.filter(p => p.id !== id))} />
+            <PostCard post={post} onDelete={id => setPosts(prev => (prev || []).filter(p => p.id !== id))} />
           </div>
         ))}
         {/* Infinite scroll loader */}
