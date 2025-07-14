@@ -2,11 +2,15 @@ from flask import Flask, request, jsonify
 from config import Config
 from extensions import init_extensions, db
 from api import auth, feed, jobs, messaging, posts, profile
+from flask_cors import CORS
 
 def create_app(config_class=Config):
     """Application factory pattern"""
     app = Flask(__name__)
     app.config.from_object(config_class)
+    
+    # Apply CORS globally for the deployed frontend
+    CORS(app, origins=["https://prok-frontend-aeh5.onrender.com"], supports_credentials=True)
     
     # Initialize extensions
     init_extensions(app)
