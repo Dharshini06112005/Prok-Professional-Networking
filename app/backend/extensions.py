@@ -9,9 +9,9 @@ import os
 db = SQLAlchemy()
 jwt = JWTManager()
 
-# CORS configuration - allow specific origins for credentials
+# CORS configuration - allow only the deployed frontend domain for production
 cors = CORS(
-    origins=["https://prok-frontend-aeh5.onrender.com", "http://localhost:3000", "http://localhost:5173"],
+    origins=["https://prok-frontend-aeh5.onrender.com"],
     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allow_headers=['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
     supports_credentials=True,
