@@ -1,4 +1,21 @@
-# Frontend Deployment Guide
+# Frontend Deployment on Render (Node.js Web Service)
+
+## Important: Use Node.js Web Service, Not Static Site
+
+To support client-side routing (SPA), you must deploy the frontend as a Node.js web service, not a static site. This ensures that refreshing any route works and does not show a 404 error.
+
+### Render Service Settings
+- **Type:** Web Service (Node.js)
+- **Start Command:** `node server.js`
+- **Build Command:** `npm install && npm run build`
+- **Publish Directory:** `dist`
+
+### Why?
+Static sites on Render do not support SPA routing. The Express server (`server.js`) is required to serve `index.html` for all non-API, non-static routes.
+
+### Troubleshooting
+- If you see 404 on refresh, you are likely using a static site. Switch to a Node.js web service.
+- Make sure your `server.js` includes the catch-all route for SPA routing.
 
 ## Quick Deploy on Render
 
