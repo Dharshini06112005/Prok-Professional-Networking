@@ -12,10 +12,8 @@ import cloudinary.uploader
 
 profile_bp = Blueprint('profile', __name__)
 
-UPLOAD_FOLDER = '/data/uploads/profile_images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'dmspcref3')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '761459965218136')
@@ -33,14 +31,6 @@ def allowed_file(filename):
 def allowed_mime(file):
     # Use Flask file object's mimetype
     return file.mimetype in ['image/jpeg', 'image/png']
-
-def compress_and_save_image(file, filename):
-    img = Image.open(file)
-    img = img.convert('RGB')
-    img.thumbnail((400, 400))
-    save_path = os.path.join(UPLOAD_FOLDER, filename)
-    img.save(save_path, format='JPEG', quality=85)
-    return filename
 
 @profile_bp.errorhandler(429)
 def ratelimit_handler(e):
@@ -205,17 +195,4 @@ def upload_image():
         return response, 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'msg': 'Image upload failed', 'error': str(e)}), 500
-
-@profile_bp.route('/image/<filename>', methods=['OPTIONS'])
-def options_image(filename):
-    return jsonify({'msg': 'OK'}), 200
-
-@profile_bp.route('/image/<filename>', methods=['GET'])
-def serve_image(filename):
-    try:
-        response = send_from_directory(UPLOAD_FOLDER, filename)
-        response.headers.add('Cache-Control', 'public, max-age=31536000')
-        return response
-    except Exception as e:
-        return jsonify({'msg': 'Image not found', 'error': str(e)}), 404 
+        return jsonify({'msg': 'Image upload failed', 'error': str(e)}), 500 
