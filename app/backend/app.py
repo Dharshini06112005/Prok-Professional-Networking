@@ -27,6 +27,15 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
+    @app.route('/', methods=['GET'])
+    def index():
+        """Root endpoint - health check"""
+        return jsonify({
+            'status': 'healthy',
+            'message': 'Prok Professional Networking Backend is running',
+            'version': '1.0.0'
+        }), 200
+
     @app.route('/health', methods=['GET'])
     def health_check():
         """Health check endpoint"""
