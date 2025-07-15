@@ -13,11 +13,9 @@ import cloudinary.uploader
 
 posts_bp = Blueprint('posts', __name__)
 
-MEDIA_FOLDER = '/data/uploads/post_media'
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'webm'}
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB
-os.makedirs(MEDIA_FOLDER, exist_ok=True)
 
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'dmspcref3')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '761459965218136')
@@ -42,14 +40,6 @@ def allowed_file(filename):
 def is_image(filename):
     ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
     return ext in ALLOWED_IMAGE_EXTENSIONS
-
-def compress_and_save_image(file, filename):
-    img = Image.open(file)
-    img = img.convert('RGB')
-    img.thumbnail((1200, 1200))
-    save_path = os.path.join(MEDIA_FOLDER, filename)
-    img.save(save_path, format='JPEG', quality=85)
-    return filename
 
 def invalidate_cache():
     global _categories_cache, _popular_tags_cache, _cache_timestamp
@@ -337,17 +327,6 @@ def get_popular_tags():
     
     return jsonify({'tags': tag_list}), 200
 
-@posts_bp.route('/media/<filename>', methods=['GET'])
-def serve_media(filename):
-    ext = filename.rsplit('.', 1)[-1].lower()
-    if ext in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
-        mimetype = 'image/jpeg' if ext in ['jpg', 'jpeg'] else f'image/{ext}'
-        return send_from_directory(MEDIA_FOLDER, filename, mimetype=mimetype)
-    elif ext in ['mp4', 'webm', 'avi', 'mov']:
-        mimetype = f'video/{ext}'
-        return send_from_directory(MEDIA_FOLDER, filename, mimetype=mimetype)
-    return send_from_directory(MEDIA_FOLDER, filename) 
-
 @posts_bp.route('/<int:post_id>', methods=['GET'])
 def get_post(post_id):
     """Get a single post by ID - public endpoint for sharing"""
@@ -417,9 +396,11 @@ def delete_post(post_id):
     # Delete media file if exists
     if post.media_url:
         filename = post.media_url.split('/')[-1]
-        file_path = os.path.join(MEDIA_FOLDER, filename)
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        # Cloudinary deletion
+        try:
+            cloudinary.uploader.destroy(filename)
+        except Exception as e:
+            print(f"Error deleting media from Cloudinary: {e}")
     db.session.delete(post)
     db.session.commit()
     invalidate_cache()
