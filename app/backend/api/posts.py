@@ -8,6 +8,8 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 from sqlalchemy import or_, desc, asc
 import re
+import cloudinary
+import cloudinary.uploader
 
 posts_bp = Blueprint('posts', __name__)
 
@@ -16,6 +18,16 @@ ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'webm'}
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB
 os.makedirs(MEDIA_FOLDER, exist_ok=True)
+
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'dmspcref3')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '761459965218136')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', 'G6YHFTGxFXRC2Sh7bjZANBkeZZ4')
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET
+)
 
 # Simple in-memory cache for categories and tags
 _categories_cache = None
@@ -81,21 +93,13 @@ def create_post():
             if file_length > MAX_FILE_SIZE:
                 return jsonify({'msg': 'File too large'}), 400
             ext = file.filename.rsplit('.', 1)[1].lower() if file.filename and '.' in file.filename else ''
-            # If image, always save as jpg
-            if is_image(file.filename):
-                filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.jpg")
-                compress_and_save_image(file, filename)
-                media_type = 'image/jpeg'
-                media_url = f'/api/posts/media/{filename}'
-            else:
-                filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.{ext}")
-                file.save(os.path.join(MEDIA_FOLDER, filename))
-                # Set media type based on file extension
-                if ext in ['mp4', 'webm', 'avi', 'mov']:
-                    media_type = f'video/{ext}'
-                else:
-                    media_type = 'application/octet-stream'
-                media_url = f'/api/posts/media/{filename}'
+            # Upload to Cloudinary
+            resource_type = 'video' if ext in ['mp4', 'webm', 'avi', 'mov'] else 'image'
+            upload_result = cloudinary.uploader.upload(file, folder='post_media', public_id=f"{int(time.time())}_{email.replace('@','_')}", overwrite=True, resource_type=resource_type)
+            media_url = upload_result.get('secure_url')
+            if not media_url:
+                return jsonify({'msg': 'Media upload failed'}), 500
+            media_type = upload_result.get('resource_type', resource_type)
         
         post = Post(
             user_email=email, 
