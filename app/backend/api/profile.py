@@ -7,6 +7,8 @@ import os, time, json
 from werkzeug.utils import secure_filename
 from PIL import Image
 import mimetypes
+import cloudinary
+import cloudinary.uploader
 
 profile_bp = Blueprint('profile', __name__)
 
@@ -14,6 +16,16 @@ UPLOAD_FOLDER = '/data/uploads/profile_images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'dmspcref3')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '761459965218136')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', 'G6YHFTGxFXRC2Sh7bjZANBkeZZ4')
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET
+)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -179,18 +191,13 @@ def upload_image():
         file.seek(0)
         if file_length > MAX_FILE_SIZE:
             return jsonify({'msg': 'File too large'}), 400
-        # Check MIME type
-        try:
-            if not allowed_mime(file):
-                return jsonify({'msg': 'Invalid image MIME type'}), 400
-        except Exception:
-            return jsonify({'msg': 'Invalid image file'}), 400
-        filename = secure_filename(f"{int(time.time())}_{email.replace('@','_')}.jpg")
-        compress_and_save_image(file, filename)
+        # Upload to Cloudinary
+        upload_result = cloudinary.uploader.upload(file, folder='profile_images', public_id=f"{int(time.time())}_{email.replace('@','_')}", overwrite=True, resource_type="image")
+        image_url = upload_result.get('secure_url')
+        if not image_url:
+            return jsonify({'msg': 'Image upload failed'}), 500
         profile = user.profile or Profile(user_email=email)
-        # Use full backend URL for avatar
-        backend_url = os.environ.get('BACKEND_URL', 'https://prok-professional-networking-t19l.onrender.com')
-        profile.avatar = f'{backend_url}/api/profile/image/{filename}'
+        profile.avatar = image_url
         if not user.profile:
             db.session.add(profile)
         db.session.commit()

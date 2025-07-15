@@ -8,4 +8,5 @@ Flask-Limiter==3.5.0
 Pillow==10.4.0
 python-dotenv==1.0.0
 psycopg[binary]==3.2.9
+cloudinary==1.36.0
  
