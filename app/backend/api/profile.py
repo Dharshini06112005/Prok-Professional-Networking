@@ -10,7 +10,7 @@ import mimetypes
 
 profile_bp = Blueprint('profile', __name__)
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', 'profile_images')
+UPLOAD_FOLDER = '/data/uploads/profile_images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

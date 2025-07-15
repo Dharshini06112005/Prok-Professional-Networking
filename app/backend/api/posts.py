@@ -11,7 +11,7 @@ import re
 
 posts_bp = Blueprint('posts', __name__)
 
-MEDIA_FOLDER = os.path.join(os.getcwd(), 'uploads', 'post_media')
+MEDIA_FOLDER = '/data/uploads/post_media'
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'webm'}
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB
