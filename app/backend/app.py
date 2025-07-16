@@ -9,8 +9,11 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
-    # Apply CORS globally for the deployed frontend
-    CORS(app, origins=["https://prok-frontend-aeh5.onrender.com"], supports_credentials=True)
+    # Apply CORS globally for the deployed frontend and localhost
+    CORS(app, origins=[
+        "https://prok-professional-networking-1.onrender.com",
+        "http://localhost:5173"
+    ], supports_credentials=True)
     
     # Initialize extensions
     init_extensions(app)
