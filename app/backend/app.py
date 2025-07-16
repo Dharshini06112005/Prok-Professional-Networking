@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
-from .config import Config
-from .extensions import init_extensions, db
-from .api import auth, feed, jobs, messaging, posts, profile
+from app.backend.config import Config
+from app.backend.extensions import init_extensions, db
+from app.backend.api import auth, feed, jobs, messaging, posts, profile
 from flask_cors import CORS
 
 def create_app(config_class=Config):
@@ -81,7 +81,9 @@ def create_app(config_class=Config):
 
     return app
 
+# Expose app for Gunicorn
+app = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
     print("Backend running at http://localhost:5000")
     app.run(debug=True)
