@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from ..extensions import db
-from ..models.post import Post
-from ..models.user import User
+from extensions import db
+from models.post import Post
+from models.user import User
 
 feed_bp = Blueprint('feed', __name__)
 
