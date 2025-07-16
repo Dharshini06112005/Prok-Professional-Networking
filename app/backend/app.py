@@ -85,5 +85,7 @@ def create_app(config_class=Config):
 app = create_app()
 
 if __name__ == "__main__":
-    print("Backend running at http://localhost:5000")
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    print(f"Backend running at http://0.0.0.0:{port}")
+    app.run(host="0.0.0.0", port=port)
