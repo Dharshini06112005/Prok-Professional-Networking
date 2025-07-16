@@ -11,7 +11,7 @@ def create_app(config_class=Config):
     
     # Apply CORS globally for the deployed frontend and localhost
     CORS(app, origins=[
-        "https://prok-professional-networking-t19l.onrender.com",
+        "https://prok-professional-networking-1.onrender.com",
         "http://localhost:5173"
     ], supports_credentials=True)
     
