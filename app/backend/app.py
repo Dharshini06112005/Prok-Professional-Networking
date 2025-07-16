@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
-from config import Config
-from extensions import init_extensions, db
-from api import auth, feed, jobs, messaging, posts, profile
+from .config import Config
+from .extensions import init_extensions, db
+from .api import auth, feed, jobs, messaging, posts, profile
 from flask_cors import CORS
 
 def create_app(config_class=Config):

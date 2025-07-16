@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from extensions import db
-from models.user import User
+from ..extensions import db
+from ..models.user import User
 from flask_jwt_extended import create_access_token
 import re
 from sqlalchemy.exc import IntegrityError
