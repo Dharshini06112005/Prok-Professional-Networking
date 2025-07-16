@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
-from config import Config
-from extensions import init_extensions, db
-from api import auth, feed, jobs, messaging, posts, profile
+from .config import Config
+from .extensions import init_extensions, db
+from .api import auth, feed, jobs, messaging, posts, profile
 from flask_cors import CORS
 
 def create_app(config_class=Config):
@@ -12,7 +12,10 @@ def create_app(config_class=Config):
     # Apply CORS globally for the deployed frontend and localhost
     CORS(app, origins=[
         "https://prok-professional-networking-1.onrender.com",
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:5176"
     ], supports_credentials=True)
     
     # Initialize extensions
@@ -88,7 +91,5 @@ def create_app(config_class=Config):
 app = create_app()
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    print(f"Backend running at http://0.0.0.0:{port}")
-    app.run(host="0.0.0.0", port=port)
+    print("Backend running at http://0.0.0.0:5000")
+    app.run(host="0.0.0.0", port=5000)

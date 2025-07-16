@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import placeholder from '../../assets/placeholder.png';
 
 interface PostCardProps {
   post: {
@@ -108,7 +109,7 @@ const PostCard: React.FC<PostCardProps & { onDelete?: (id: number) => void }> = 
             alt="Post Media"
             style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px', background: '#f3f4f6' }}
             onError={e => {
-              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Image+Not+Found';
+              (e.target as HTMLImageElement).src = placeholder;
             }}
           />
         </div>
